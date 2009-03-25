@@ -1,0 +1,266 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                        Ch 3 - Deploying Applications
+
+  This Ant build script is used to build and deploy various examples
+  from chapter 3.
+
+============================================================================ -->
+<project name="deployment" default="help" basedir=".">
+
+  <!-- Specifies the location of the global include and properties files -->
+  <property name="dir.ch00" location="../ch00" />
+
+  <!-- Get properties related to the user's environment. -->
+  <property file="${dir.ch00}/build.properties" />
+
+  <!-- Import various properties and targets -->
+  <import file="${dir.ch00}/build-include.xml" />
+
+  <!-- Override help target from include script to avoid confusion. -->
+  <target name="help">
+    <echo>usage: ant NN</echo>
+    <echo>where NN is 01 through 02</echo>
+    <echo>Enter "ant -p" for full target list.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Note that only one example can be built at a time because each target
+      removes the "target" directory.
+    ============================================================================
+  -->
+  <target description="(3.2) Builds, packages and deploys several applications used to demonstrate various class scoping concepts."
+          name="01"
+          depends="init-01, g-init, g-reset-jboss, 01-package"
+  />
+  <target description="(3.3.1) Builds and packages the jarFinder utility from Isocra Ltd."
+          name="02"
+          depends="02-package"
+  />
+  <target description="(3.4.2) Builds and deploys a Hibernate archive and initializes the database.."
+          name="03"
+          depends="init-03, g-init, g-reset, 03-package"
+  />
+
+
+  <!--
+    ============================================================================
+      This set of variations of the major targets compile, package and deploy
+      the application. Initialization of the application server and database, if
+      needed, is left up to you. You can avoid application deployment by
+      setting "-Dno.deploy" on the ant command line.
+    ============================================================================
+  -->
+
+  <target name="01-package"
+          depends="init-01, g-init, g-clean, g-war, g-deploy-war-exploded, 01-deploy"
+  />
+  <target name="02-package"
+          depends="init-02, g-init, g-clean, g-jar, g-script"
+  />
+  <target name="03-package"
+          depends="init-03, g-init, g-clean, g-war, har, g-deploy-war, deploy-har"
+  />
+
+
+  <!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+
+  <!--
+    Properties specific to the class visibility demo. The main application is
+    the WAR used to run the demo.
+  -->
+  <target name="init-01">
+    <property name="alt.target" value="01" />
+    <property name="dir.main" location="src/route" />
+    <property name="app.name" value="route" />
+    <property name="include.classes"
+              value="**/InWar.class,**/*Servlet.class,**/Same.class"
+    />
+    <property name="exclude.files.war" value="**/*.cdr" />
+  </target>
+
+  <!-- Properties specific to the jarFinder utility -->
+  <target name="init-02">
+    <property name="alt.target" value="02" />
+    <property name="dir.main" location="src/jarFinder" />
+    <property name="app.name" value="jarFinder" />
+    <!-- No need for JBoss AS classes for jarFinder -->
+    <property name="ignore.classpath" value="true" />
+    <path id="classpath" />
+  </target>
+
+  <!-- Properties specific to the Hibernate archive example -->
+  <target name="init-03">
+    <property name="alt.target" value="03" />
+    <property name="dir.main" location="src/video" />
+    <property name="app.name" value="video" />
+    <property name="include.classes" value="**/VideoServlet.class" />
+    <property name="need.resources" value="true" />
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+  <!-- Set these before the global properties are set. -->
+  <target name="init-pre">
+    <property name="book.chapter" value="Ch 03 - Deploying Applications" />
+  </target>
+
+  <!-- Set these after the global properties are set. -->
+  <target name="init-post">
+    <property name="har.name" value="video.har" />
+    <property name="har.path" location="${dir.dist}/${har.name}" />
+    <!-- Specify optional processing required. -->
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to compile, package and
+      deploy the additional applications used for the class visibility demo.
+    ============================================================================
+  -->
+
+  <target name="01-deploy" depends="01-build, scoped-ear">
+    <copy todir="${dir.lib}" file="${dir.dist}/inlib.jar" />
+    <copy todir="${dir.deploy}" file="${dir.dist}/indeploy.jar" />
+    <copy todir="${dir.deploy}" file="${dir.dist}/inear.ear" />
+    <copy todir="${dir.deploy}" file="${dir.dist}/insar.sar" />
+    <copy todir="${dir.deploy}" file="${dir.dist}/inscopedear.ear" />
+  </target>
+
+  <target name="01-build">
+    <antcall target="g-jar">
+      <param name="jar.path" value="${dir.dist}/inlib.jar" />
+      <!--
+        Place the EJB interface class in the JAR file in the lib directory so
+        that both the WAR and the scoped EAR have access to it. If the interface
+        is in the scoped EAR, the WAR will not have visibility to the interface.
+        If the interface is in the WAR but not the scoped EAR, the scoped EAR
+        will not have visibility to the interface. If it is in both places, then
+        a class cast expcetion will happen because the WAR is using a different
+        interface instance that the EAR. All of thesep roblems are avoided by
+        placing the interface (IInScopedEar) in a global location accessible to
+        both the WAR and the scoped EAR.
+      -->
+      <param name="include.classes"
+             value="**/InLib.class,**/Version.class,**/IInScopedEar.class"
+      />
+    </antcall>
+    <antcall target="g-jar">
+      <param name="jar.path" value="${dir.dist}/indeploy.jar" />
+      <param name="include.classes" value="**/InDeploy.class" />
+    </antcall>
+    <antcall target="g-jar">
+      <param name="jar.path" value="${dir.dist}/inear.jar" />
+      <param name="include.classes" value="**/InEar.class,**/Same.class" />
+    </antcall>
+    <antcall target="g-ear">
+      <param name="ear.name" value="inear.ear" />
+      <param name="ear.path" value="${dir.dist}/inear.ear" />
+      <param name="include.archives" value="**/inear.jar" />
+    </antcall>
+    <antcall target="g-jar">
+      <param name="jar.path" value="${dir.dist}/insar.jar" />
+      <param name="include.classes" value="**/InSar.class" />
+    </antcall>
+    <antcall target="g-sar">
+      <param name="sar.name" value="insar.sar" />
+      <param name="sar.path" value="${dir.dist}/insar.sar" />
+      <param name="include.archives" value="**/insar.jar" />
+    </antcall>
+  </target>
+
+  <!--
+    The scoped EAR package is the second EAR created, it uses scoped class
+    loading and its own version of the Version class.
+  -->
+  <target name="scoped-ear">
+    <antcall target="g-jar">
+      <param name="dir.main" value="${dir.src}/scoped" />
+      <param name="java.source" value="${dir.src}/scoped/java" />
+      <param name="dir.classes" value="${dir.output}/scoped" />
+      <param name="jar.path" value="${dir.dist}/inscopedear.jar" />
+      <param name="include.classes"
+             value="**/InScopedEar.class,**/Version.class"
+      />
+    </antcall>
+    <antcall target="g-ear">
+      <param name="dir.main" value="${dir.src}/scoped" />
+      <param name="ear.name" value="inscopedear.ear" />
+      <param name="ear.path" value="${dir.dist}/inscopedear.ear" />
+      <param name="include.archives" value="**/inscopedear.jar" />
+    </antcall>
+  </target>
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to compile, package and
+      deploy the Hibernate archive.
+    ============================================================================
+  -->
+
+  <!-- Packages the Hibernate archive. -->
+  <target name="har">
+    <antcall target="g-jar">
+      <param name="jar.path" value="${har.path}" />
+      <param name="include.classes"
+             value="**/Video.class,**/*-hibernate.xml,**/Video.hbm.xml"
+      />
+    </antcall>
+  </target>
+
+  <!-- Deploys the HAR file to the application server. -->
+  <target name="deploy-har" unless="no.deploy">
+    <copy todir="${dir.deploy}" file="${har.path}" verbose="true" />
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <target description="Removes all generated files."
+          name="clean"
+          depends="g-clean"
+  />
+  <target description="Removes all generated files, the JBoss AS configuration and the database."
+          name="clean-all"
+          depends="g-clean-all"
+  />
+
+</project>

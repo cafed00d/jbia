@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/jmxservice/java"/>
+	<classpathentry kind="src" path="src/ejbsecurity/java"/>
+	<classpathentry kind="src" path="src/hibernate-injection/java"/>
+	<classpathentry kind="src" path="src/jndibinding/java"/>
+	<classpathentry kind="src" path="src/sampleapp/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="JBOSS_HOME/client/jbossall-client.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deployers/ejb3.deployer/jboss-annotations-ejb3.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deployers/ejb3.deployer/jboss-ejb3.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deployers/jbossweb.deployer/jsf-libs/jboss-faces.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deployers/jbossweb.deployer/jsf-libs/jsf-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deployers/jbossweb.deployer/jsf-libs/jsf-impl.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/hibernate3.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-aop-jdk50.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

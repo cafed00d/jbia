@@ -1,0 +1,487 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                           Ch 8 - JBoss Messaging
+
+  This Ant build script is used to build and deploy the example messaging
+  clients, EJBs and POJOs used in the JBoss Messaging chapter.
+
+============================================================================ -->
+<project name="messaging" default="help" basedir=".">
+
+  <!-- Specifies the location of the global include and properties files -->
+  <property name="dir.ch00" location="../ch00" />
+
+  <!-- Get properties related to the user's environment. -->
+  <property file="${dir.ch00}/build.properties" />
+
+  <!-- Import various properties and targets -->
+  <import file="${dir.ch00}/build-include.xml" />
+
+  <!-- Override help target from include script to avoid confusion. -->
+  <target name="help">
+    <echo>usage: ant NN</echo>
+    <echo>where NN is 01 through 07</echo>
+    <echo>Enter "ant -p" for full target list.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Note that only one example can be built at a time because almost all
+      examples use the same base code and typically just change configuration.
+      In addition, each major target rebuilds the application server, and
+      possibly initializes the database, to guarantee correct operation of the
+      example. You should ensure that the application server is not running
+      before invoking any of these targets.
+    ============================================================================
+  -->
+  <target description="(8.2) Builds and packages the messaging clients, and initializes the messaging server."
+          name="01"
+          depends="init-01, g-clean, g-reset-jboss, 01-package"
+  />
+  <target description="(8.3.1-2) Builds and packages the messaging clients and the MDB (using annotations), initializes the messaging server, and deploys the MDB."
+          name="02"
+          depends="init-02, g-clean, g-reset-jboss, 02-package"
+  />
+  <target description="(8.3.3) Builds and packages the messaging clients and the MDB (using descriptors), initializes the messaging server, and deploys the MDB."
+          name="03"
+          depends="init-03, g-clean, g-reset-jboss, 03-package"
+  />
+  <target description="(8.4) Builds and packages the messaging clients and the messaging POJO, initializes the messaging server, and deploys the POJO."
+          name="04"
+          depends="init-04, g-clean, g-reset-jboss, 04-package"
+  />
+  <target description="(8.5.1-5) Sets up a database, authorization, and custom destinations for the messaging clients."
+          name="05"
+          depends="init-05, g-clean, g-reset-jboss, 05-package, g-reset-db"
+  />
+  <target description="(8.5.6) Sets up a database, authorization, and custom destinations for the messaging clients and MDB."
+          name="06"
+          depends="init-06, g-clean, g-reset-jboss, 06-package, g-reset-db"
+  />
+  <target description="(8.5.7) Builds and packages the messaging clients which use SSL encryption, and initializes the messaging server."
+          name="07"
+          depends="init-07, g-clean, g-reset-jboss, 07-package, ssl"
+  />
+
+
+  <!--
+    ============================================================================
+      This set of variations of the major targets compile, package and deploy
+      the application. Initialization of the application server and database, if
+      needed, is left up to you. You can avoid application deployment by
+      setting "-Dno.deploy" on the ant command line.
+    ============================================================================
+  -->
+  <target name="01-package" depends="init-01, g-clean, g-jar, g-script" />
+  <target name="02-package"
+          depends="init-02, g-clean, g-jar, mdb, g-script, deploy-mdb"
+  />
+  <target name="03-package"
+          depends="init-03, g-clean, alt-03, g-jar, mdb, g-script, deploy-mdb"
+  />
+  <target name="04-package"
+          depends="init-04, g-clean, alt-04, pojoclient, mdb, pojo, g-script, deploy-pojo"
+  />
+  <target name="05-package"
+          depends="init-05, g-clean, g-jar, g-script, deploy-dest"
+  />
+  <target name="06-package"
+          depends="init-06, g-clean, g-jar, mdb, g-script, deploy-mdb, deploy-dest"
+  />
+  <target name="07-package" depends="init-07, g-clean, g-jar, g-script" />
+
+
+  <!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+  <target name="init-01">
+    <property name="alt.target" value="01" />
+  </target>
+  <target name="init-02">
+    <property name="alt.target" value="02" />
+    <property name="jar.todeploy" location="${jar.mdb.path}" />
+  </target>
+  <target name="init-03">
+    <property name="alt.target" value="03" />
+    <property name="jar.todeploy" location="${jar.mdb.path}" />
+  </target>
+  <target name="init-04">
+    <property name="alt.target" value="04" />
+    <property name="jar.todeploy" location="${jar.pojo.path}" />
+  </target>
+  <target name="init-05">
+    <property name="alt.target" value="05" />
+    <property name="need.database" value="true" />
+    <property name="db.dsxml" value="./src/alt/jboss/encrypted-ds.xml" />
+    <property name="db.password.encrypted"
+              value="4328fae45aec5dd57f96b0e7b2b2e76fdf8592078de921bc"
+    />
+  </target>
+  <target name="init-06">
+    <property name="alt.target" value="06" />
+    <property name="jar.todeploy" location="${jar.mdb.path}" />
+    <property name="need.database" value="true" />
+    <property name="db.dsxml" value="./src/alt/jboss/encrypted-ds.xml" />
+    <property name="db.password.encrypted"
+              value="4328fae45aec5dd57f96b0e7b2b2e76fdf8592078de921bc"
+    />
+    <antcall target="g-init" />
+  </target>
+  <target name="init-07">
+    <property name="alt.target" value="07" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets apply the configurations and variations, as defined
+      by each example. This must be done before the code is compiled.
+    ============================================================================
+  -->
+  <target name="alt-03">
+    <copy todir="${dir.classes}">
+      <fileset dir="${dir.alt}/${alt.target}" includes="**/ejb-jar.xml" />
+    </copy>
+  </target>
+  <target name="alt-04">
+    <copy todir="${dir.gen}">
+      <fileset dir="${dir.alt}/${alt.target}" includes="**/*.java" />
+    </copy>
+    <copy todir="${dir.classes}">
+      <fileset dir="${dir.alt}/${alt.target}" includes="**/ejb-jar.xml" />
+    </copy>
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+  <!-- Set these before the global properties are set. -->
+  <target name="init-pre">
+    <property name="book.chapter" value="Ch 08 - JBoss Messaging" />
+    <property name="app.name" value="sofaspuds" />
+  </target>
+
+  <!-- Set these after the global properties are set. -->
+  <target name="init-post">
+    <!--
+      Set properties related to alternative directories used by some of the
+      examples.
+    -->
+    <property name="dir.alt.jboss" location="${dir.alt}/jboss" />
+    <property name="dir.alt.db" location="${dir.alt}/db" />
+    <property name="dir.alt.keystore" location="${dir.alt}/keystore" />
+
+    <!-- Set properties related to the generated files. -->
+    <property name="jar.mdb.name" value="wiretap.jar" />
+    <property name="jar.mdb.path" location="${dir.dist}/${jar.mdb.name}" />
+    <property name="jar.pojo.name" value="credit.jar" />
+    <property name="jar.pojo.path" location="${dir.dist}/${jar.pojo.name}" />
+
+    <!-- Files to be included in the client (default) JAR file -->
+    <property name="include.classes"
+              value="**/Customer.class,**/Store.class,**/Video.class,**/jndi.properties"
+    />
+
+    <!-- Set properties related to the JBoss AS. -->
+    <property name="dir.messaging" location="${dir.deploy}/messaging" />
+
+    <!--
+      Database-related properties whose values are the same regardless of which
+      database is being used:
+    -->
+    <property name="security.realm" value="video-realm" />
+
+    <!-- Specify optional processing required -->
+    <property name="need.preprocess" value="true" />
+    <property name="need.jndi" value="true" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to compile, package and
+      deploy the messaging service examples.
+    ============================================================================
+  -->
+
+  <!-- Packages the MDB classes into a JAR file. -->
+  <target name="mdb">
+    <antcall target="g-jar">
+      <param name="jar.path" value="${jar.mdb.path}" />
+      <param name="include.classes"
+             value="**/Video.class,**/WireTap.class,**/ejb-jar.xml"
+      />
+    </antcall>
+  </target>
+
+  <!-- Packages the client classes into a JAR file for use with the POJO. -->
+  <target name="pojoclient">
+    <!-- 
+      The call to g-jar causes the preprocessor macros to be read, but they are
+      then discarded because we are calling g-jar as an antcall. But we need
+      those, preprocessor macros later, so read them now. Note that all of the
+      the other target call g-jar directly, and not as an antcall.
+    -->
+    <property file="${dir.alt}/${alt.target}/preprocessor.properties" />
+    <antcall target="g-jar">
+      <param name="include.classes"
+             value="${include.classes}, **/ICredit.class"
+      />
+    </antcall>
+  </target>
+
+  <!-- Packages the messaging POJO classes into a JAR file. -->
+  <target name="pojo">
+    <antcall target="g-jar">
+      <param name="jar.path" value="${jar.pojo.path}" />
+      <param name="include.classes" value="**/Credit.class,**/ICredit.class" />
+    </antcall>
+  </target>
+
+  <!-- Deploys the MDB JAR to the application server. -->
+  <target name="deploy-mdb" unless="no.deploy">
+    <antcall target="g-deploy-jar">
+      <param name="jar.path" value="${jar.mdb.path}" />
+    </antcall>
+  </target>
+
+  <!-- Deploys the POJO JAR to the application server. -->
+  <target name="deploy-pojo" unless="no.deploy">
+    <antcall target="g-deploy-jar">
+      <param name="jar.path" value="${jar.pojo.path}" />
+    </antcall>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      application server for use with the messaging service.
+    ============================================================================
+  -->
+
+  <!-- Do this after the application server has been initalized. -->
+  <target name="jboss-post">
+    <!--
+      Finally, the GA release includes the example destinations, so we no
+      longer have to provide it with our code and can instead copy it from the
+      examples directory.
+    -->
+    <copy file="${dir.examples}/jms/example-destinations-service.xml"
+          tofile="${dir.messaging}/destinations-service.xml"
+          verbose="true"
+          overwrite="true"
+          preservelastmodified="true"
+    />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      database for use with the messaging service.
+    ============================================================================
+  -->
+  <target name="db-post" depends="db-roles, db-persistence, db-login" />
+
+  <!-- Populate the database with users and roles -->
+  <target name="db-roles" if="mysql.or.postgresql">
+    <sql driver="${db.driver}"
+         url="${db.url.base}${db.database}"
+         userid="${db.user}"
+         password="${db.password}"
+         onerror="continue"
+         src="${dir.alt.db}/${mysql.or.postgresql}-populate.sql"
+         print="true"
+         autocommit="true"
+    >
+      <classpath location="${database.jar}" />
+    </sql>
+  </target>
+
+  <!--
+    Replaces the persistence service with the one for the selected database. In
+    addition, the persistence service datasource name is changed and clustered 
+    is set to false.
+  -->
+  <target name="db-persistence" if="mysql.or.postgresql">
+    <delete file="${dir.deploy}/messaging/hsqldb-persistence-service.xml" />
+    <copy file="${dir.examples}/jms/${mysql.or.postgresql}-persistence-service.xml"
+          todir="${dir.config}"
+          verbose="true"
+    >
+      <filterchain>
+        <tokenfilter>
+          <replacestring from="DefaultDS" to="${db.datasource}" />
+          <replacestring from="name=&quot;Clustered&quot;&gt;true"
+                         to="name=&quot;Clustered&quot;&gt;false"
+          />
+          <replacestring from="&lt;depends optional-attribute-name=&quot;ChannelFactoryName&quot;&gt;jboss.jgroups:service=ChannelFactory&lt;/depends&gt;"
+                         to="&lt;!-- depends optional-attribute-name=&quot;ChannelFactoryName&quot;&gt;jboss.jgroups:service=ChannelFactory&lt;/depends --&gt;"
+          />
+        </tokenfilter>
+      </filterchain>
+    </copy>
+    <copy todir="${dir.messaging}"
+          file="${dir.config}/${mysql.or.postgresql}-persistence-service.xml"
+          overwrite="true"
+    />
+  </target>
+
+  <!--
+    Add the database login module to the login-config.xml file, and update the
+    messaging service to use that login module.
+  -->
+  <target name="db-login">
+    <copy file="${dir.conf}/login-config.xml" todir="${dir.config}">
+      <filterchain>
+        <tokenfilter>
+          <replacestring from="/policy" to="${login.module}" />
+        </tokenfilter>
+      </filterchain>
+    </copy>
+    <copy file="${dir.messaging}/messaging-jboss-beans.xml" todir="${dir.config}">
+      <filterchain>
+        <tokenfilter>
+          <replacestring from="securityDomain&quot;&gt;messaging"
+                         to="securityDomain&quot;&gt;${security.realm}"
+          />
+          <!--
+            Since we are already making other changes to the messaging-service.xml
+            file, we might as well also modify the password for message sucker
+            and thus close this security hole (anyone who knows this password
+            can get access to all messages).
+          -->
+          <replacestring from="CHANGE ME!!" to="${db.password}" />
+        </tokenfilter>
+      </filterchain>
+    </copy>
+    <copy todir="${dir.conf}"
+          file="${dir.config}/login-config.xml"
+          overwrite="true"
+    />
+    <copy todir="${dir.messaging}"
+          file="${dir.config}/messaging-jboss-beans.xml"
+          overwrite="true"
+    />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets perform various tasks specific to the messaging
+      service examples.
+    ============================================================================
+  -->
+
+  <!-- Deploys the file containing the custom destinations. -->
+  <target name="deploy-dest" unless="no.deploy">
+    <copy file="${dir.alt.jboss}/${app.name}-service.xml"
+          todir="${dir.deploy}"
+          verbose="true"
+          overwrite="true"
+          preservelastmodified="true"
+    />
+  </target>
+
+
+  <!-- ===================================================================== -->
+  <!-- Targets that set up server and client for SSL. -->
+  <target name="ssl" depends="ssl-remoting, ssl-keystore, ssl-client" />
+
+  <!-- Deploys the SSL remoting config file. -->
+  <target name="ssl-remoting">
+    <!-- delete file="${dir.messaging}/remoting-service.xml"
+            failonerror="false"
+    / -->
+    <copy file="${dir.examples}/jms/remoting-sslbisocket-service.xml"
+          todir="${dir.config}"
+    >
+      <filterchain>
+        <replacestring from="${jboss.server.home.url}/deploy/messaging/messaging.keystore"
+                       to="${jboss.server.config.url}server.keystore"
+        />
+        <replacestring from="secureexample" to="videospuds" />
+      </filterchain>
+    </copy>
+    <!-- Patch other config files to reference the sslbisocket MBean. -->
+    <copy todir="${dir.config}">
+      <fileset dir="${dir.messaging}">
+        <include name="connection-factories-service.xml" />
+        <include name="messaging-service.xml" />
+      </fileset>
+      <filterchain>
+        <replacestring from="jboss.messaging:service=Connector,transport=bisocket"
+                       to="jboss.messaging:service=Connector,transport=sslbisocket"
+        />
+        <replacestring from="secureexample" to="videospuds" />
+      </filterchain>
+    </copy>
+    <!-- Copy the modified configurastion files to the messaging directory -->
+    <copy todir="${dir.messaging}" overwrite="true">
+      <fileset dir="${dir.config}" />
+    </copy>
+  </target>
+
+  <!-- Copies the server's keystore. -->
+  <target name="ssl-keystore">
+    <copy file="${dir.alt.keystore}/server.keystore"
+          todir="${dir.conf}"
+          preservelastmodified="true"
+    />
+  </target>
+
+  <!-- Copies the client's keystore. -->
+  <target name="ssl-client">
+    <copy file="${dir.alt.keystore}/client.keystore"
+          todir="${dir.dist}"
+          preservelastmodified="true"
+    />
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <target description="Removes all generated files."
+          name="clean"
+          depends="g-clean"
+  />
+  <target description="Removes all generated files and the JBoss AS configuration."
+          name="clean-all"
+          depends="g-clean-all"
+  />
+
+</project>

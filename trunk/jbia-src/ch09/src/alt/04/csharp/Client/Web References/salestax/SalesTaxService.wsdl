@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:tns="http://ws.jbia.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SalesTaxService" targetNamespace="http://ws.jbia.org/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xs:schema targetNamespace="http://ws.jbia.org/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="getRate" type="tns:getRate" />
+      <xs:element name="getRateResponse" type="tns:getRateResponse" />
+      <xs:complexType name="getRate">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getRateResponse">
+        <xs:sequence>
+          <xs:element name="return" type="xs:double" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </types>
+  <message name="SalesTax_getRate">
+    <part name="getRate" element="tns:getRate" />
+  </message>
+  <message name="SalesTax_getRateResponse">
+    <part name="getRateResponse" element="tns:getRateResponse" />
+  </message>
+  <portType name="SalesTax">
+    <operation name="getRate" parameterOrder="getRate">
+      <input message="tns:SalesTax_getRate" />
+      <output message="tns:SalesTax_getRateResponse" />
+    </operation>
+  </portType>
+  <binding name="SalesTaxBinding" type="tns:SalesTax">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="getRate">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="SalesTaxService">
+    <port name="SalesTaxPort" binding="tns:SalesTaxBinding">
+      <soap:address location="http://localhost:8080/salestax/tax" />
+    </port>
+  </service>
+</definitions>

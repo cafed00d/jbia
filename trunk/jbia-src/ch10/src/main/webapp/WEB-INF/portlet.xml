@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+-->
+<portlet-app
+  xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation=
+    "http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd"
+  version="1.0">
+  <portlet>
+    <portlet-name>ImagePortlet</portlet-name>
+    <display-name>Image Portlet</display-name>
+    <description>Displays an image from the Web.</description>
+    <portlet-class>org.jbia.portlet.ImagePortlet</portlet-class>
+
+    <!--
+      These parameters are passed to the init() method on the portlet. 
+    -->
+    <init-param>
+      <name>jsp-view</name>
+      <value>/WEB-INF/jsp/view.jsp</value>
+    </init-param>
+    <init-param>
+      <name>jsp-help</name>
+      <value>/WEB-INF/jsp/help.jsp</value>
+    </init-param>
+    <init-param>
+      <name>jsp-edit</name>
+      <value>/WEB-INF/jsp/edit.jsp</value>
+    </init-param>
+
+    <supports>
+      <mime-type>text/html</mime-type>
+      <portlet-mode>VIEW</portlet-mode>
+      <portlet-mode>EDIT</portlet-mode>
+      <portlet-mode>HELP</portlet-mode>
+    </supports>
+    <resource-bundle>org.jbia.portlet.message</resource-bundle>
+
+    <!--
+      The porltet allows the user to override the window title.
+    -->
+    <portlet-info>
+      <title>Image Portlet</title>
+    </portlet-info>
+
+    <!--
+      The default preferences display the Red Hat logo. All preferences are
+      listed, even those that are empty (regex), so that we can later override
+      them in the portlet-instances.xml file.
+    -->
+    <portlet-preferences>
+      <preference>
+        <name>title</name>
+        <value>Red Hat Logo</value>
+      </preference>
+      <preference>
+        <name>url</name>
+      <value>http://www.redhat.com/g/chrome/logo_rh_home.png</value>
+      </preference>
+      <preference>
+        <name>regex</name>
+        <value></value>
+      </preference>
+    </portlet-preferences>
+  </portlet>
+</portlet-app>

@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!--
+ *******************************************************************************
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                            Included Build Script
+
+  This Ant build script contains various properties, targets and macros used
+  by many of the other build scripts. It is intended that the other scripts
+  include this script, do not run this script by itself.
+
+============================================================================ -->
+<project name="ssl-include" basedir="." default="help">
+
+	<!-- Tell the user to run one of the chapter-specific build scripts. -->
+	<target name="help">
+		<echo>Do not run this script directly. Instead, cd to one of the chapter</echo>
+		<echo>directories, such as 'cd ../ch08', and run the Ant script there.</echo>
+	</target>
+
+
+	<!--
+    =====================================================================================
+      The following targets initialize the properties used for creating ssl certificates.
+    =====================================================================================
+    -->
+	<target name="s-init" depends="ssl-init-pre, s-init-props" />
+
+	<!--
+	    Override this target if you need to set any properties before the properties are set to create ssl certificates
+	  -->
+	<target name="ssl-init-pre" />
+
+	<target name="s-init-props">
+		<property name="dir.keystore" value="${dir.output}/keystore" />
+
+		<property name="ssl.client.keystore.alias" value="clientCertificate" />
+		<property name="ssl.client.keystore.algorithm" value="RSA" />
+		<property name="ssl.client.keystore.validity" value="1500" />
+		<property name="ssl.client.keystore.filename" value="client.keystore" />
+		<property name="ssl.client.keystore.cn" value="&quot;Joe Schmoe&quot;" />
+		<property name="ssl.client.keystore.dname" value="cn=${ssl.client.keystore.cn},o=SomeCA,ou=SomeCAOrg" />
+		<property name="ssl.client.keystore.keypass" value="clientpass" />
+		<property name="ssl.client.keystore.keystorepass" value="clientpass" />
+		<property name="ssl.client.x509.filename" value="client.cer" />
+		<property name="ssl.client.truststore.keystorepass" value="clientpass" />
+		<property name="ssl.client.truststore.filename" value="client.truststore" />
+		<property name="ssl.client.truststore.alias" value="serverCertificate" />
+		<property name="ssl.client.p8.filename" value="client.p8" />
+		<property name="ssl.client.p12.filename" value="client.p12" />
+		<property name="ssl.client.pem.filename" value="client-pem.cer" />
+		<property name="ssl.client.p12.password" value="clientpass" />
+
+		<property name="ssl.server.keystore.alias" value="serverCertificate" />
+		<property name="ssl.server.keystore.algorithm" value="RSA" />
+		<property name="ssl.server.keystore.validity" value="1500" />
+		<property name="ssl.server.keystore.filename" value="server.keystore" />
+		<property name="ssl.server.keystore.dname" value="cn=ServerCert,o=SomeCA,ou=SomeCAOrg" />
+		<property name="ssl.server.keystore.keypass" value="serverpass" />
+		<property name="ssl.server.keystore.keystorepass" value="serverpass" />
+		<property name="ssl.server.x509.filename" value="server.cer" />
+		<property name="ssl.server.truststore.keystorepass" value="serverpass" />
+		<property name="ssl.server.truststore.filename" value="server.truststore" />
+		<property name="ssl.server.truststore.alias" value="${ssl.client.keystore.cn}" />
+
+	</target>
+
+	<!--
+      This will create a keystore that holds the server certificate.
+	-->
+	<target name="s-create-server-certificate" depends="s-init">
+		<mkdir dir="${dir.keystore}" />
+
+		<echo message="keytool -genkey -alias ${ssl.server.keystore.alias} -keyalg ${ssl.server.keystore.algorithm} -validity ${ssl.server.keystore.validity} -keystore ${ssl.server.keystore.filename} -dname ${ssl.server.keystore.dname} -keypass ${ssl.server.keystore.keypass} -storepass ${ssl.server.keystore.keystorepass}" />
+
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg line="-genkey -alias ${ssl.server.keystore.alias} -keyalg ${ssl.server.keystore.algorithm} -validity ${ssl.server.keystore.validity} -keystore ${ssl.server.keystore.filename} -dname ${ssl.server.keystore.dname} -keypass ${ssl.server.keystore.keypass} -storepass ${ssl.server.keystore.keystorepass}" />
+		</exec>
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg line="-list -keystore ${ssl.server.keystore.filename} -storepass ${ssl.server.keystore.keystorepass}" />
+		</exec>
+	</target>
+
+	<!--
+      This will create a keystore that holds the client certificate.
+	-->
+	<target name="s-create-client-certificate" depends="s-init">
+		<mkdir dir="${dir.keystore}" />
+
+		<echo message="keytool -genkey -alias ${ssl.client.keystore.alias} -keyalg ${ssl.client.keystore.algorithm} -validity ${ssl.client.keystore.validity} -keystore ${ssl.client.keystore.filename} -dname ${ssl.client.keystore.dname} -keypass ${ssl.client.keystore.keypass} -storepass ${ssl.client.keystore.keystorepass}" />
+
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg line="-genkey -alias ${ssl.client.keystore.alias} -keyalg ${ssl.client.keystore.algorithm} -validity ${ssl.client.keystore.validity} -keystore ${ssl.client.keystore.filename} -dname ${ssl.client.keystore.dname} -keypass ${ssl.client.keystore.keypass} -storepass ${ssl.client.keystore.keystorepass}" />
+		</exec>
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg line="-list -keystore ${ssl.client.keystore.filename} -storepass ${ssl.client.keystore.keystorepass}" />
+		</exec>
+
+	</target>
+
+	<!--
+      This will export the X509 certificate from the server keystore.
+	-->
+	<target name="s-export-server-certificate" depends="s-create-server-certificate">
+
+		<echo message="keytool -export -alias ${ssl.server.keystore.alias} -keystore ${ssl.server.keystore.filename} -storepass ${ssl.server.keystore.keystorepass} -file ${ssl.server.x509.filename}" />
+
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg line="-export -alias ${ssl.server.keystore.alias} -keystore ${ssl.server.keystore.filename} -storepass ${ssl.server.keystore.keystorepass} -file ${ssl.server.x509.filename}" />
+		</exec>
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg value="-printcert" />
+			<arg value="-file" />
+			<arg value="${ssl.server.x509.filename}" />
+		</exec>
+	</target>
+
+	<!--
+      This will export the X509 certificate from the server keystore.
+	-->
+	<target name="s-export-client-certificate" depends="s-create-client-certificate">
+
+		<echo message="keytool -export -alias ${ssl.client.keystore.alias} -keystore ${ssl.client.keystore.filename} -storepass ${ssl.client.keystore.keystorepass} -file ${ssl.client.x509.filename}" />
+
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg line="-export -alias ${ssl.client.keystore.alias} -keystore ${ssl.client.keystore.filename} -storepass ${ssl.client.keystore.keystorepass} -file ${ssl.client.x509.filename}" />
+		</exec>
+		<exec executable="${keytool.executable}" dir="${dir.keystore}">
+			<arg value="-printcert" />
+			<arg value="-file" />
+			<arg value="${ssl.client.x509.filename}" />
+		</exec>
+
+	</target>
+
+
+	<!--
+      This will create a server truststore that contains the client's X509 certificate
+	-->
+	<target name="s-create-server-truststore" depends="s-export-client-certificate">
+
+		<echo message="keytool -import -alias ${ssl.server.truststore.alias} -keystore ${ssl.server.truststore.filename} -storepass ${ssl.server.truststore.keystorepass} -file ${ssl.client.x509.filename}" />
+
+		<exec executable="${keytool.executable}" dir="${dir.keystore}" inputstring="y">
+			<arg line="-import -alias ${ssl.server.truststore.alias} -keystore ${ssl.server.truststore.filename} -storepass ${ssl.server.truststore.keystorepass} -file ${ssl.client.x509.filename}" />
+		</exec>
+	</target>
+
+	<!--
+      This will create a client truststore that contains the server's X509 certificate
+	-->
+	<target name="s-create-client-truststore" depends="s-export-server-certificate">
+
+		<echo message="keytool -import -alias ${ssl.client.truststore.alias} -keystore ${ssl.client.truststore.filename} -storepass ${ssl.client.truststore.keystorepass} -file ${ssl.server.x509.filename}" />
+
+		<exec executable="${keytool.executable}" dir="${dir.keystore}" inputstring="y">
+			<arg line="-import -alias ${ssl.client.truststore.alias} -keystore ${ssl.client.truststore.filename} -storepass ${ssl.client.truststore.keystorepass} -file ${ssl.server.x509.filename}" />
+		</exec>
+	</target>
+
+	<!--
+      This will convert the client X509 certificate that keytool created to the PKCS12 format that web browsers recognize
+	-->
+	<target name="s-convert-client-x509-to-pkcs12" depends="s-export-client-certificate">
+
+		<!-- Extract the clientCert private key to client.p8 -->
+		<echo message="Running com.manning.jbia.ExportPrivateKey class to convert client X509 certificate to PKCS12 format." />
+		<echo message="   Input file: ${dir.keystore}/${ssl.client.keystore.filename}" />
+		<echo message="   Keystore alias: ${ssl.client.keystore.alias}" />		
+		<echo message="   Keystore pass: ${ssl.client.keystore.keystorepass}" />
+		<echo message="   Output file: ${dir.keystore}/${ssl.client.p8.filename}" />
+		<path id="classpath.runtime">
+			<pathelement location="${dir.classes}" />
+		</path>
+		<java classname="com.manning.jbia.ExportPrivateKey" classpathref="classpath.runtime" output="${dir.keystore}/${ssl.client.p8.filename}">
+			<!-- keystore -->
+			<arg value="${dir.keystore}/${ssl.client.keystore.filename}" />
+			<!-- alias -->
+			<arg value="${ssl.client.keystore.alias}" />
+			<!-- password -->
+			<arg value="${ssl.client.keystore.keystorepass}" />
+		</java>
+
+		<!-- Convert client.cert from DER to PEM to do the pkcs12 conversion -->
+		<echo message="openssl x509 -out ${ssl.client.pem.filename} -outform pem -text -in ${ssl.client.x509.filename} -inform der" />
+		<exec executable="${openssl.executable}" dir="${dir.keystore}">
+			<arg line="x509 -out ${ssl.client.pem.filename} -outform pem -text -in ${ssl.client.x509.filename} -inform der" />
+		</exec>
+
+		<!-- Combine the private key and public key into pkcs12 format -->
+		<echo message="openssl pkcs12 -export -out client.p12 -inkey ${ssl.client.p8.filename} -in ${ssl.client.pem.filename} -passout pass:${ssl.client.p12.password}" />
+		<exec executable="${openssl.executable}" dir="${dir.keystore}">
+			<arg line="pkcs12 -export -out client.p12 -inkey ${ssl.client.p8.filename} -in ${ssl.client.pem.filename} -passout pass:${ssl.client.p12.password}" />
+		</exec>
+	</target>
+
+
+	<!--
+    =====================================================================================
+      The following targets deploy the server certificates/keystores to the server.
+    =====================================================================================
+    -->
+	<target name="s-deploy-server-certificates" depends="s-init" >
+	    <condition property="exists.server.keystore">
+	      <available file="${dir.keystore}/${ssl.server.keystore.filename}" />
+	    </condition>
+		<antcall target="s-deploy-server-keystore" />
+	    <condition property="exists.server.truststore">
+	      <available file="${dir.keystore}/${ssl.server.truststore.filename}" />
+	    </condition>
+		<antcall target="s-deploy-server-truststore" />
+	</target>
+	<target name="s-deploy-server-keystore" depends="s-init" if="exists.server.keystore">
+		<copy file="${dir.keystore}/${ssl.server.keystore.filename}" todir="${dir.conf}" preservelastmodified="true" />
+	</target>
+	<target name="s-deploy-server-truststore" depends="s-init" if="exists.server.truststore">
+		<copy file="${dir.keystore}/${ssl.server.truststore.filename}" todir="${dir.conf}" preservelastmodified="true" />
+	</target>
+</project>

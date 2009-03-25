@@ -1,0 +1,341 @@
+<!--
+#  Copyright 2008, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+<title>JBIA - Web Services</title>
+</head>
+
+<body>
+
+<h1>Ch 9 - Configuring Web Services</h1>
+<p>All build targets create an application server configuration named <code>
+ws</code>. After the build, to run the application server, open another command window,
+<code>cd</code> to the applications server's <code>bin</code> directory, and
+enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c ws</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c ws</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>The source files are pre-processed for many of these targets. The final
+source files can be found at <code>target/gen</code> and <code>target/client-gen</code>.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">01</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.2.1-9.2.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the web service using the bottom-up
+    methodology, initializes the application server, and deploys the web
+    service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Point your browser at <a target="_blank"
+  href="http://localhost:8080/jbossws/services">http://localhost:8080/jbossws/services</a>
+to view the web service information, and the WSDL.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">02</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.2.4</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the web service using the top-down methodology,
+    initializes the application server, and deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Point your browser at <a target="_blank"
+  href="http://localhost:8080/jbossws/services">http://localhost:8080/jbossws/services</a>
+to view the web service information, and the WSDL.</p>
+<p>The build starts with the SalesTax class from the prior example, uses the
+wsprovide utility to generate the WSDL, and then the wsconsume utility to
+generate the stubs, which are then used to build the service.</p>
+<a name="03">
+<hr />
+</a>
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">03</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.2.5</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the web service and client, initializes the
+    application server, and deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>To run the client, from the command prompt where you ran the build,
+enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">target/dist/client.sh CA TX NH</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">target\dist\client CA TX NH</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>When you run the client, you get two warning messages about logging. You
+can safely ignore those. The client itself does not contain any logging code,
+but some of the libraries used by web services use logging and it is because of
+those libraries that the warning message appears.</p>
+<a name="04">
+<hr />
+</a>
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">04</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.2.6</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the Web service for use with a C# client, and
+    initializes the application server, and deploys the Web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>The following steps are specific to using Visual Studio 2005 or 2008 on
+Windows.</p>
+<p>After you start the application server, double-click the <code>ch09/target/csharp/SalesTax.sln</code>
+file. Once Visual Studio opens, click the Start Debug button in the tool bar.
+Another command window opens showing sales tax for various states.</p>
+<p>At this point you can also run the client from the same command prompt
+you used to do the build. Enter:</p>
+<pre>target\csharp\Client\bin\Debug\Client.exe CA TX NH</pre>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">05</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.2.7</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the web service, Java client, and C# client,
+    using the RPC SOAP binding, initializes the application server, and deploys
+    the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<p>You can run the C# client as described for target <a href="#04">04</a>
+above.</p>
+<a name="06">
+<hr />
+</a>
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">06</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.3.1</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the EJB-based web service and client,
+    initializes the application server, and deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">07</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.4.1</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the secured web service and client, initializes
+    the application server, and deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">08</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.4.1</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the EJB-based secured web service and client,
+    initializes the application server, and deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">09</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.5.2, 9.5.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the web service and client, using WSSecurity to
+    encrypt the messages, initializes the application server, and deploys the
+    web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<p>You can view the encrypted messages in <code>server/ws/log/server.log<code>.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">10</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.5.2, 9.5.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the EJB-based web service and client, using
+    WSSecurity to encrypt the messages, initializes the application server, and
+    deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<p>You can view the encrypted messages in <code>server/ws/log/server.log<code>.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">11</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.5.4</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the web service and client, using WSSecurity to
+    encrypt and sign the messages, initializes the application server, and
+    deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<p>You can view the encrypted messages in <code>server/ws/log/server.log<code>.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">12</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>9.5.4</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the EJB-based web service and client, using
+    WSSecurity to encrypt and sign the messages, initializes the application
+    server, and deploys the web service.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You can run the Java client as described for target <a href="#03">03</a>
+above.</p>
+<p>You can view the encrypted messages in <code>server/ws/log/server.log<code>.</p>
+<hr />
+<p align="center">&copy; 2008, Javid Jamae and Peter Johnson</p>
+</body>
+</html>

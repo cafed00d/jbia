@@ -1,0 +1,206 @@
+/*
+================================================================================
+  Copyright 2008, Javid Jamae and Peter Johnson
+ 
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy
+  of the License at
+ 
+     http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations
+  under the License.
+================================================================================
+*/
+body {
+  font-family: sans-serif;
+  font-size: 10pt;
+}
+
+/* Horizontal lines use the book's border color (orangy-brown). */
+hr {
+  height: 2px;
+  background-color: #D78017;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  width: 90%;
+}
+
+/* Headings use the red color for "JBoss" in the book's title. */
+h1,h2,h3 {
+  font-family: sans-serif;
+  color: #700201;
+}
+
+/* Links use the "JBoss" red color. */
+a:link,a:visited {
+  color: #700201;
+}
+
+/* When clicked, links turn the book's border color. */
+a:hover,a:active,a:focus {
+  color: #D78017;
+}
+
+/* Code is indented and has a colored background based on book's border */
+pre {
+  background-color: rgb(255,242,229);
+  margin-left: 2em;
+  margin-bottom: 0;
+}
+
+/* No margins between code lines */
+p + pre, pre + pre {
+  margin-top: 0;
+}
+
+/* Quotes are italicized */
+q {
+  font-style: italic;
+}
+
+/* Display in-text code in dark blue */
+code {
+  color: #000066
+}
+
+/* Highlight things that are not working correctly. */
+p.warning {
+  background-color: #FFAACC;
+  padding: 0.5em;
+}
+
+/*
+================================================================================
+
+  The following styles define the 'target' table layout:
+  - a slightly indented table
+  - labels, using th, in the left column are bold and right-aligned
+  - no visible borders
+  - target number is bolded and "JBoss" red
+ 
+  This table appears at the start of the description of every build target.
+
+================================================================================
+*/
+table.target {
+  padding: 2px;
+  margin-left: 0;
+  border-width: 0px;
+}
+
+table.target td,table.target th{
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+table.target th {
+  font-family: san-serif;
+  font-weight: bold;
+  text-align: left;
+  vertical-align: top;
+}
+
+td.targetNumber {
+  font-weight: bold;
+  color: #700201;
+}
+
+/* No spacing between "After the build" and following paragraph */
+table.target + p {
+  margin-top: 0;
+}
+
+/*
+================================================================================
+
+  The following styles define the 'command' table layout:
+  - a slightly indented table
+  - the left column, using th, contains code in fixed-width font
+  - no visible borders
+
+  This table contains example commands entered on Windows and Linux.
+
+================================================================================
+*/
+table.command {
+  padding: 2px;
+  margin-left: 1em;
+  border-width: 0px;
+}
+
+table.command td {
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-left: 1em;
+}
+
+td.commandText {
+  font-family: monospace;
+  padding-right: 6em;
+  background-color: rgb(255,242,229);
+}
+
+/*
+================================================================================
+
+  The header contains a title (the book title, using same color and similar
+  fonts), and a subtitle. In addtion, the background is the book's border
+  color.
+
+================================================================================
+*/
+body.header {
+  background-image: url(header.jpg);
+}
+
+div.title {
+  float: left;
+}
+
+span.titleJboss {
+  font-size: 30pt;
+  font-weight: bolder;
+  color: #700201
+}
+
+span.titleAction {
+  font-size: 24pt;
+  font-weight: bold;
+}
+
+div.subtitle {
+  float: right;
+}
+
+/*
+================================================================================
+
+  The navigation links in the left panel are smaller, and remain black until
+  hovered over.
+
+================================================================================
+*/
+a.nav {
+  font-size: 8pt;
+}
+
+ol.nav {
+  padding-left: 2em;
+}
+
+/*
+================================================================================
+
+  Styles for the footer area of the pages.
+
+================================================================================
+*/
+p.copyright {
+  font-size: 8pt;
+}
