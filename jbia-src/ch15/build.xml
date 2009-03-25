@@ -1,0 +1,513 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                        Ch 15 - Going to Production
+
+  This Ant build script is used to build and deploy various examples from
+  chapter 15.
+
+============================================================================ -->
+<project name="production" default="help" basedir=".">
+
+  <!-- Specifies the location of the global include and properties files -->
+  <property name="dir.ch00" location="../ch00" />
+
+  <!-- Get properties related to the user's environment. -->
+  <property file="${dir.ch00}/build.properties" />
+
+  <!-- Import various properties and targets -->
+  <import file="${dir.ch00}/build-include.xml" />
+
+  <!-- Need the environment variables for some of the examples. -->
+  <property environment="env" />
+
+  <!-- We will get the database config files from the messaging files. -->
+  <property name="dir.msg" location="../ch08" />
+  <property name="dir.msg.jboss" location="${dir.msg}/src/alt/jboss" />
+
+  <!-- Override help target from include script to avoid confusion. -->
+  <target name="help">
+    <echo>usage: ant NN</echo>
+    <echo>where NN is 01 through 04</echo>
+    <echo>Enter "ant -p" for full target list.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Note that only one example can be built at a time because almost all
+      examples use the same base code and typically just change configuration.
+      In addition, each major target rebuilds the application server, and
+      possibly initializes the database, to guarantee correct operation of the
+      example. You should ensure that the application server is not running
+      before invoking any of these targets.
+    ============================================================================
+  -->
+  <target description="(15.2.1, 15.2.2) Creates two application servers, using Service Binding Manager to assign unique ports."
+          name="01"
+          depends="init-01, g-init, clean, g-reset-jboss"
+  />
+  <target description="(15.2.1, 15.2.3) Creates two application servers, using multi-homing to avoid port conflicts."
+          name="02"
+          depends="init-02, g-init, clean, g-reset-jboss"
+  />
+  <target description="(15.5) Creates one application server, using a database other than Hypersonic for DefaultDS."
+          name="03"
+          depends="init-03, g-init, clean, g-reset, alt-03"
+  />
+  <target description="(15.6) Creates two application servers, using Service Binding Manager to assign unique ports, and generates scripts that can be used register both servers as services."
+          name="04"
+          depends="init-04, g-init, clean, g-reset-jboss, alt-04"
+  />
+
+
+  <!--
+    ============================================================================
+      This set of variations of the major targets compile, package and deploy
+      the application. Initialization of the application server and database, if
+      needed, is left up to you. You can avoid application deployment by
+      setting "-Dno.deploy" on the ant command line.
+    ============================================================================
+  -->
+
+
+  <!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+  <target name="init-01">
+    <property name="alt.target" value="01" />
+    <property name="need.second.server" value="true" />
+  </target>
+  <target name="init-02">
+    <property name="alt.target" value="02" />
+    <property name="need.second.server" value="true" />
+  </target>
+  <target name="init-03">
+    <property name="alt.target" value="03" />
+    <property name="db.datasource" value="DefaultDS" />
+    <property name="need.database" value="true" />
+    <property name="clean.hypersonic" value="true" />
+  </target>
+  <target name="init-04">
+    <property name="alt.target" value="04" />
+    <property name="need.second.server" value="true" />
+    <property name="need.native" value="true" />
+    <property name="app.name" value="service" />
+    <property name="dir.main" value="src/${app.name}" />
+    <property name="linux.distro" value="redhat" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets apply the configurations and variations, as defined
+      by each example. This must be done before the code is compiled.
+    ============================================================================
+  -->
+
+  <!-- Sets up the database configuration files. -->
+  <target name="alt-03" />
+
+  <!-- Generates the scripts used to run the service. -->
+  <target name="alt-04" depends="service-linux, service-windows" />
+
+
+  <!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+  <!-- Set these before the global properties are set. -->
+  <target name="init-pre">
+    <property name="book.chapter" value="Ch 15 - Going to Production" />
+  </target>
+
+  <!-- Set these after the global properties are set. -->
+  <target name="init-post">
+    <property name="dir.alt.jboss" location="${dir.alt}/jboss" />
+    <property name="jboss.server.2" value="${jboss.server}-2" />
+    <property name="dir.examples" value="${home.jboss}/docs/examples" />
+    <!-- Specify optional processing required. -->
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      application server.
+    ============================================================================
+  -->
+
+  <!-- Do this after the application server has been initialized. -->
+  <target name="jboss-post" depends="jboss-second-server, jboss-native">
+  </target>
+
+  <!-- Create a second server configuration, if needed. -->
+  <target name="jboss-second-server" if="need.second.server">
+    <!-- Generate a second server configuration -->
+    <antcall target="g-jboss-server">
+      <param name="dir.server" value="${dir.server.base}/${jboss.server.2}" />
+    </antcall>
+  </target>
+
+  <!--
+    Installs the JBoss Native files. Be aware the 5.0.0.GA ships with the
+    service.bat and jbosssvc.exe file necessary to run JBoss AS as a service.
+    Unfortunately, the jbosssvc.exe file is 32-bit and does not work on 64-bit
+    Windows systems. However, by always copying from JBoss Native, you will get
+    the correct version of jbosssvc.exe on Windows provided you set home.native
+    to the proper version of JBoss Native. If your are running Linux, you can
+    ignore all of that.
+  -->
+  <target name="jboss-native" if="need.native">
+    <copy todir="${home.jboss}/bin"
+          preservelastmodified="true"
+          overwrite="true"
+    >
+      <fileset dir="${home.native}/bin" />
+    </copy>
+    <antcall target="jboss-runbat" />
+  </target>
+
+  <!--
+    KLUDGE:
+    The run.bat file looks in the wrong location for the APR libraries installed
+    from JBoss native. This target corrects the location.
+  -->
+  <target name="jboss-runbat" if="os.windows">
+    <mkdir dir="${dir.output}/jboss"/>
+    <copy todir="${dir.output}/jboss">
+      <fileset file="${home.jboss}/bin/run.bat" />
+      <filterchain>
+        <replacestring from="windows-%JAVA_PLATFORM%"
+                       to="windows\%JAVA_PLATFORM%"
+        />
+      </filterchain>
+    </copy>
+    <copy todir="${home.jboss}/bin" overwrite="true">
+      <fileset file="${dir.output}/jboss/run.bat" />
+    </copy>
+  </target>
+
+  <!--
+    ============================================================================
+      The following targets build the scripts that install and run the
+      application server as a service.
+    ============================================================================
+  -->
+
+  <target name="service-linux" if="os.linux">
+    <antcall target="build-first-service">
+      <param name="inter.platform" value="Linux" />
+    </antcall>
+    <antcall target="build-second-service">
+      <param name="inter.platform" value="Linux" />
+    </antcall>
+    <copy todir="${dir.output}/linux">
+      <fileset dir="${dir.main}/linux" includes="*install.sh" />
+      <filterchain>
+        <expandproperties />
+        <deletecharacters chars="\r" />
+      </filterchain>
+    </copy>
+    <chmod perm="a+x">
+      <fileset dir="${dir.output}/linux">
+        <include name="*.sh" />
+      </fileset>
+    </chmod>
+  </target>
+
+  <target name="service-windows" if="os.windows">
+    <antcall target="build-first-service">
+      <param name="inter.platform" value="Windows" />
+    </antcall>
+    <antcall target="build-second-service">
+      <param name="inter.platform" value="Windows" />
+    </antcall>
+    <copy todir="${home.jboss}/bin">
+      <fileset dir="${dir.output}/windows" />
+    </copy>
+  </target>
+
+  <!-- Intermediaries to prevent repetition when creating services. -->
+  <target name="build-first-service">
+    <antcall target="build-service">
+      <param name="inter.server" value="${jboss.server}" />
+      <param name="inter.binding" value="ports-default" />
+      <param name="inter.ordinal" value="first" />
+      <param name="inter.port" value="1099" />
+    </antcall>
+  </target>
+  <target name="build-second-service">
+    <antcall target="build-service">
+      <param name="inter.server" value="${jboss.server.2}" />
+      <param name="inter.binding" value="ports-01" />
+      <param name="inter.ordinal" value="second" />
+      <!-- Note the dependency on the port setting in the binding config file -->
+      <param name="inter.port" value="1199" />
+    </antcall>
+  </target>
+  <target name="build-service">
+    <antcall target="build-service-2">
+      <param name="param.service.name" value="jbia-${inter.server}" />
+      <param name="param.service.disp"
+             value="JBoss in Action, server ${inter.server}"
+      />
+      <param name="param.service.desc"
+             value="JBoss in Action, ch 15, ${inter.platform} service example, ${inter.ordinal} server"
+      />
+      <param name="param.jboss.server" value="${inter.server}" />
+      <param name="param.jboss.host" value="localhost" />
+      <param name="param.jboss.binding" value="${inter.binding}" />
+      <param name="param.jndi.port" value="${inter.port}" />
+    </antcall>
+  </target>
+  <target name="build-service-2">
+    <antcall target="build-windows-service" />
+    <antcall target="build-linux-service" />
+  </target>
+
+  <!-- Builds the scripts used to create and run the Windows service. -->
+  <target name="build-windows-service" if="os.windows">
+    <copy file="${dir.main}/windows/service.bat"
+          tofile="${dir.output}/windows/service-${param.jboss.server}.bat"
+    >
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+  </target>
+
+  <!-- Builds the scripts used to run the Linux service. -->
+  <target name="build-linux-service" if="os.linux">
+    <copy file="${dir.main}/linux/jboss_init_${linux.distro}.sh"
+          tofile="${dir.output}/linux/jboss_init_${param.jboss.server}.sh"
+    >
+      <filterchain>
+        <expandproperties />
+        <deletecharacters chars="\r" />
+      </filterchain>
+    </copy>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      database.
+    ============================================================================
+  -->
+  <target name="db-post" depends="db-datatypes, clean-hypersonic" />
+
+  <!-- Remove all files related to Hypersonic -->
+  <target name="clean-hypersonic" if="clean.hypersonic">
+    <delete file="${dir.deploy}/hsqldb-ds.xml" />
+    <delete>
+      <fileset dir="${dir.lib}" includes="**/hsqldb*.jar" />
+    </delete>
+    <delete file="${dir.deploy}/messaging/hsqldb-persistence-service.xml" />
+    <!--
+      Deploy the correct messaging service file for the database, turning off
+      clustering as we do so.
+    -->
+    <copy file="${dir.examples}/jms/${mysql.or.postgresql}-persistence-service.xml"
+          todir="${dir.config}"
+          verbose="true"
+    >
+      <filterchain>
+        <tokenfilter>
+          <replacestring from="name=&quot;Clustered&quot;&gt;true"
+                         to="name=&quot;Clustered&quot;&gt;false"
+          />
+          <replacestring from="&lt;depends optional-attribute-name=&quot;ChannelFactoryName&quot;&gt;jboss.jgroups:service=ChannelFactory&lt;/depends&gt;"
+                         to="&lt;!-- depends optional-attribute-name=&quot;ChannelFactoryName&quot;&gt;jboss.jgroups:service=ChannelFactory&lt;/depends --&gt;"
+          />
+        </tokenfilter>
+      </filterchain>
+    </copy>
+    <copy todir="${dir.deploy}/messaging"
+          file="${dir.config}/${mysql.or.postgresql}-persistence-service.xml"
+          overwrite="true"
+    />
+    <!-- Change the EJB3 timer BINARY type to the correct type for the database -->
+    <copy file="${dir.deploy}/ejb3-timer-service.xml"
+          todir="${dir.config}"
+          verbose="true"
+    >
+      <filterchain>
+        <tokenfilter>
+          <replacestring from="HSQLDBDelegate" to="${quartz.delegate}" />
+          <replacestring from="BINARY" to="${db.datatype.binary}" />
+          <replacestring from="VARCHAR(1)" to="${db.datatype.varchar1}" />
+          <replacestring from="NUMERIC(13)" to="${db.datatype.numeric13}" />
+          <replacestring from="NUMERIC(12)" to="${db.datatype.numeric12}" />
+          <replacestring from="NUMERIC(7)" to="${db.datatype.numeric7}" />
+          <replacestring from="NUMERIC(2)" to="${db.datatype.numeric2}" />
+          <replacestring from="qrtz_job_listeners"
+                         to="${db.table.qrtz_job_listeners}"
+          />
+          <replacestring from="qrtz_trigger_listeners"
+                         to="${db.table.qrtz_trigger_listeners}"
+          />
+          <replacestring from="qrtz_fired_triggers"
+                         to="${db.table.qrtz_fired_triggers}"
+          />
+          <replacestring from="qrtz_paused_trigger_grps"
+                         to="${db.table.qrtz_paused_trigger_grps}"
+          />
+          <replacestring from="qrtz_scheduler_state"
+                         to="${db.table.qrtz_scheduler_state}"
+          />
+          <replacestring from="qrtz_locks" to="${db.table.qrtz_locks}" />
+          <replacestring from="qrtz_simple_triggers"
+                         to="${db.table.qrtz_simple_triggers}"
+          />
+          <replacestring from="qrtz_cron_triggers"
+                         to="${db.table.qrtz_cron_triggers}"
+          />
+          <replacestring from="qrtz_blob_triggers"
+                         to="${db.table.qrtz_blob_triggers}"
+          />
+          <replacestring from="qrtz_triggers" to="${db.table.qrtz_triggers}" />
+          <replacestring from="qrtz_job_details"
+                         to="${db.table.qrtz_job_details}"
+          />
+          <replacestring from="qrtz_calendars"
+                         to="${db.table.qrtz_calendars}"
+          />
+        </tokenfilter>
+      </filterchain>
+    </copy>
+    <copy todir="${dir.deploy}"
+          file="${dir.config}/ejb3-timer-service.xml"
+          overwrite="true"
+    />
+  </target>
+
+  <!-- Convert the Hypersonic data types to ones appropriate to the database -->
+  <target name="db-datatypes" depends="mysql-datatypes, postgresql-datatypes" />
+  <target name="mysql-datatypes" if="database.mysql">
+    <property name="quartz.delegate" value="StdJDBCDelegate" />
+    <property name="db.datatype.binary" value="BLOB" />
+    <property name="db.datatype.varchar1" value="BOOL" />
+    <property name="db.datatype.numeric13" value="BIGINT(13)" />
+    <property name="db.datatype.numeric12" value="BIGINT(12)" />
+    <property name="db.datatype.numeric7" value="BIGINT(7)" />
+    <property name="db.datatype.numeric2" value="SMALLINT(2)" />
+    <!-- MySQL table names on Linux are case-sensitive, so up-case them! -->
+    <property name="db.table.qrtz_job_listeners" value="QRTZ_JOB_LISTENERS" />
+    <property name="db.table.qrtz_trigger_listeners"
+              value="QRTZ_TRIGGER_LISTENERS"
+    />
+    <property name="db.table.qrtz_fired_triggers" value="QRTZ_FIRED_TRIGGERS" />
+    <property name="db.table.qrtz_paused_trigger_grps"
+              value="QRTZ_PAUSED_TRIGGER_GRPS"
+    />
+    <property name="db.table.qrtz_scheduler_state"
+              value="QRTZ_SCHEDULER_STATE"
+    />
+    <property name="db.table.qrtz_locks" value="QRTZ_LOCKS" />
+    <property name="db.table.qrtz_simple_triggers"
+              value="QRTZ_SIMPLE_TRIGGERS"
+    />
+    <property name="db.table.qrtz_cron_triggers" value="QRTZ_CRON_TRIGGERS" />
+    <property name="db.table.qrtz_blob_triggers" value="QRTZ_BLOB_TRIGGERS" />
+    <property name="db.table.qrtz_triggers" value="QRTZ_TRIGGERS" />
+    <property name="db.table.qrtz_job_details" value="QRTZ_JOB_DETAILS" />
+    <property name="db.table.qrtz_calendars" value="QRTZ_CALENDARS" />
+  </target>
+  <target name="postgresql-datatypes" if="database.postgresql">
+    <property name="quartz.delegate" value="PostgreSQLDelegate" />
+    <property name="db.datatype.binary" value="BYTEA" />
+    <property name="db.datatype.varchar1" value="BOOL" />
+    <property name="db.datatype.numeric13" value="BIGINT" />
+    <property name="db.datatype.numeric12" value="BIGINT" />
+    <property name="db.datatype.numeric7" value="BIGINT" />
+    <property name="db.datatype.numeric2" value="SMALLINT" />
+    <!-- The PostgreSQL table names will still be lower cased. -->
+    <property name="db.table.qrtz_job_listeners" value="qrtz_job_listeners" />
+    <property name="db.table.qrtz_trigger_listeners"
+              value="qrtz_trigger_listeners"
+    />
+    <property name="db.table.qrtz_fired_triggers" value="qrtz_fired_triggers" />
+    <property name="db.table.qrtz_paused_trigger_grps"
+              value="qrtz_paused_trigger_grps"
+    />
+    <property name="db.table.qrtz_scheduler_state"
+              value="qrtz_scheduler_state"
+    />
+    <property name="db.table.qrtz_locks" value="qrtz_locks" />
+    <property name="db.table.qrtz_simple_triggers"
+              value="qrtz_simple_triggers"
+    />
+    <property name="db.table.qrtz_cron_triggers" value="qrtz_cron_triggers" />
+    <property name="db.table.qrtz_blob_triggers" value="qrtz_blob_triggers" />
+    <property name="db.table.qrtz_triggers" value="qrtz_triggers" />
+    <property name="db.table.qrtz_job_details" value="qrtz_job_details" />
+    <property name="db.table.qrtz_calendars" value="qrtz_calendars" />
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <target description="Removes all generated files."
+          name="clean"
+          depends="g-clean"
+  >
+    <!-- Remove the second server configuration, it if exists -->
+    <delete dir="${dir.server.base}/${jboss.server.2}" failonerror="false" />
+  </target>
+
+  <target description="Removes all generated files, the JBoss AS configurations, and uninstalls the JBoss services."
+          name="clean-all"
+          depends="clean, g-clean-all, clean-native"
+  />
+
+  <!--
+    Removes the files related to JBoss Native and services. The jbosssvc.exe and
+    service.bat file are not removed because they now ship with 5.0.0.GA. Note,
+    however, that those files could be the ones copied from JBoss Native, not
+    the ones that shipped with 5.0.0.GA.
+  -->
+  <target name="clean-native">
+    <delete dir="${home.jboss}/bin/META-INF" failonerror="false" />
+    <delete failonerror="false">
+      <fileset dir="${home.jboss}/bin">
+        <include name="jbossweb*.exe" />
+        <include name="README-service.txt" />
+        <include name="service-*.bat" />
+        <include name="*${jboss.server}*.log" />
+      </fileset>
+    </delete>
+    <delete dir="${home.jboss}/bin/native" failonerror="false" />
+  </target>
+
+</project>

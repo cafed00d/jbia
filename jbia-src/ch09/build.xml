@@ -1,0 +1,637 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                           Ch 9 - Configuring Web Services
+
+  This Ant build script is used to build and deploy the example Web service,
+  and its client, as described in the Web services chapter.
+
+============================================================================ -->
+<project name="ws" default="help" basedir=".">
+
+  <!-- Specifies the location of the global include and properties files -->
+  <property name="dir.ch00" location="../ch00" />
+
+  <!-- Get properties related to the user's environment. -->
+  <property file="${dir.ch00}/build.properties" />
+
+  <!-- Import various properties and targets -->
+  <import file="${dir.ch00}/build-include.xml" />
+
+  <!-- Override help target from include script to avoid confusion. -->
+  <target name="help">
+    <echo>usage: ant NN</echo>
+    <echo>where NN is 01 through 12</echo>
+    <echo>Enter "ant -p" for full target list.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Note that only one example can be built at a time because almost all
+      examples use the same base code and typically just change configuration.
+      In addition, each major target rebuilds the application server to
+      guarantee correct operation of the example. You should ensure that the
+      application server is not running before invoking any of these targets.
+    ============================================================================
+  -->
+  <target description="(9.2.1-9.2.3) Builds, packages and deploys a Web service using the bottom-up development approach. Also initializes an application server."
+          name="01"
+          depends="init-01, g-init, g-reset-jboss, 01-package"
+  />
+  <target description="(9.2.4) Builds, packages and deploys a Web service using the top-down development approach. Also initializes an application server."
+          name="02"
+          depends="init-02, g-init, g-reset-jboss, 02-package"
+  />
+  <target description="(9.2.5) Builds, packages and deploys a Web service and a Java client. Also initializes an application server."
+          name="03"
+          depends="init-03, g-init, g-reset-jboss, 03-package"
+  />
+  <target description="(9.2.6) Builds, packages and deploys a Web service for use with a C# client. Also initializes an application server."
+          name="04"
+          depends="init-04, g-init, g-reset-jboss, 04-package"
+  />
+  <target description="(9.2.7) Builds, packages and deploys a Web service using RPC-style SOAP binding for use with both Java and  C# clients. Also initializes an application server."
+          name="05"
+          depends="init-05, g-init, g-reset-jboss, 05-package"
+  />
+  <target description="(9.3.1) Builds, packages and deploys an EJB-based Web service and a Java client. Also initializes an application server."
+          name="06"
+          depends="init-06, g-init, g-reset-jboss, 06-package"
+  />
+  <target description="(9.4.1) Builds, packages and deploys a Web service that requires authorization, and a Java client. Also initializes an application server."
+          name="07"
+          depends="init-07, g-init, g-reset-jboss, 07-package"
+  />
+  <target description="(9.4.1) Builds, packages and deploys an EJB-based Web service that requires authorization, and a Java client. Also initializes an application server."
+          name="08"
+          depends="init-08, g-init, g-reset-jboss, 08-package"
+  />
+  <target description="(9.5.2, 9.5.3) Builds, packages and deploys a Web service and client, using WSSecurity to encrypt the messages. Also initializes an application server."
+          name="09"
+          depends="init-09, g-init, g-reset-jboss, 09-package"
+  />
+  <target description="(9.5.2, 9.5.3) Builds, packages and deploys an EJB-based Web service and client, using WSSecurity to encrypt the messages. Also initializes an application server."
+          name="10"
+          depends="init-10, g-init, g-reset-jboss, 10-package"
+  />
+  <target description="(9.5.4) Builds, packages and deploys a Web service and client, using WSSecurity to encrypt and sign messages. Also initializes an application server."
+          name="11"
+          depends="init-11, g-init, g-reset-jboss, 11-package"
+  />
+  <target description="(9.5.4) Builds, packages and deploys an EJB-based Web service and client, using WSSecurity to encrypt and sign messages. Also initializes an application server."
+          name="12"
+          depends="init-12, g-init, g-reset-jboss, 12-package"
+  />
+
+
+  <!--
+    ============================================================================
+      This set of variations of the major targets compile, package and deploy
+      the application. Initialization of the application server and database, if
+      needed, is left up to you. You can avoid application deployment by
+      setting "-Dno.deploy" on the ant command line.
+    ============================================================================
+  -->
+  <target name="01-package"
+          depends="init-01, g-init, g-clean, g-war, g-deploy-war"
+  />
+  <!-- You can add 'client' to the 'depends' list to build the client. -->
+  <target name="02-package"
+          depends="init-02, g-init, g-clean, alt-02, g-war, g-deploy-war-exploded"
+  />
+  <target name="03-package"
+          depends="init-03, g-init, g-clean, g-war, g-deploy-war, client"
+  />
+  <target name="04-package"
+          depends="init-04, g-init, g-clean, g-war, g-deploy-war, c#-client"
+  />
+  <target name="05-package"
+          depends="init-05, g-init, g-clean, g-war, g-deploy-war, client, c#-client"
+  />
+  <target name="06-package"
+          depends="init-06, g-init, g-clean, g-jar, g-deploy-jar, client"
+  />
+  <target name="07-package"
+          depends="init-07, g-init, g-clean, g-war, g-deploy-war, client"
+  />
+  <target name="08-package"
+          depends="init-08, g-init, g-clean, g-jar, g-deploy-jar, client"
+  />
+  <target name="09-package"
+          depends="init-09, g-init, g-clean, g-war, g-deploy-war, client"
+  />
+  <target name="10-package"
+          depends="init-10, g-init, g-clean, g-jar, g-deploy-jar, client"
+  />
+  <target name="11-package"
+          depends="init-11, g-init, g-clean, g-war, g-deploy-war, client"
+  />
+  <target name="12-package"
+          depends="init-12, g-init, g-clean, g-jar, g-deploy-jar, client"
+  />
+
+
+  <!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+  <target name="init-01">
+    <property name="alt.target" value="01" />
+    <property name="need.preprocess" value="true" />
+  </target>
+  <target name="init-02">
+    <property name="alt.target" value="02" />
+    <property name="alt.02" value="true" />
+    <property name="need.preprocess" value="true" />
+    <!-- If building the client, do so based on the stubs generated. -->
+    <property name="dir.client.stubs" location="target/alt02/stubs" />
+  </target>
+  <target name="init-03">
+    <property name="alt.target" value="03" />
+    <property name="need.preprocess" value="true" />
+    <!--
+      Use the stubs from the alt directory - they are doc-binding specific.
+      The standard stubs for the client are rpc-binding specific.
+    -->
+    <property name="dir.client.stubs" location="src/alt/${alt.target}/stubs" />
+  </target>
+  <target name="init-04">
+    <property name="alt.target" value="04" />
+    <property name="need.preprocess" value="true" />
+    <property name="use.soapdoc" value="true" />
+  </target>
+  <target name="init-05">
+    <property name="alt.target" value="05" />
+    <property name="need.preprocess" value="true" />
+  </target>
+  <target name="init-06">
+    <property name="alt.target" value="06" />
+    <property name="need.preprocess" value="true" />
+  </target>
+  <target name="init-07">
+    <property name="alt.target" value="07" />
+    <property name="jboss.users.roles" value="true" />
+    <property name="alt.07" value="true" />
+    <property name="need.preprocess" value="true" />
+  </target>
+  <target name="init-08">
+    <property name="alt.target" value="08" />
+    <property name="jboss.users.roles" value="true" />
+    <property name="need.preprocess" value="true" />
+  </target>
+  <target name="init-09">
+    <property name="alt.target" value="09" />
+    <property name="alt.09" value="true" />
+    <property name="need.preprocess" value="true" />
+    <property name="need.wssecurity" value="encryption" />
+  </target>
+  <target name="init-10">
+    <property name="alt.target" value="10" />
+    <property name="alt.10" value="true" />
+    <property name="need.preprocess" value="true" />
+    <property name="need.wssecurity" value="encryption" />
+  </target>
+  <target name="init-11">
+    <property name="alt.target" value="11" />
+    <property name="alt.11" value="true" />
+    <property name="need.preprocess" value="true" />
+    <property name="need.wssecurity" value="signature" />
+  </target>
+  <target name="init-12">
+    <property name="alt.target" value="12" />
+    <property name="alt.12" value="true" />
+    <property name="need.preprocess" value="true" />
+    <property name="need.wssecurity" value="signature" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets apply the configurations and variations, as defined
+      by each example.
+    ============================================================================
+  -->
+
+  <!--
+    This is a little tricky. We first compile the same SalesTax class used in
+    target 01. Then we use wsprovide to generate the WSDL from that class. We
+    then run wsconsume to generate the stubs from that WSDL. Finally, we combine
+    the stubs and the SalesTaxImpl class to build the web service.
+  -->
+  <target name="alt-02">
+    <property name="dir.alt02" location="${dir.output}/alt02" />
+    <!-- Compile SalesTax from target 01, after applying preprocessing. -->
+    <property file="${dir.alt}/01/preprocessor.properties" />
+    <copy todir="${dir.alt02}/java">
+      <fileset dir="${dir.java}" />
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+    <mkdir dir="${dir.alt02}/classes" />
+    <javac debug="true"
+           srcdir="${dir.alt02}/java"
+           destdir="${dir.alt02}/classes"
+    >
+      <classpath refid="classpath" />
+    </javac>
+    <!-- Use wsprovide to generate the WSDL. -->
+    <condition property="script.suffix" value=".sh">
+      <os family="unix" />
+    </condition>
+    <condition property="script.suffix" value=".bat">
+      <os family="windows" />
+    </condition>
+    <exec executable="${home.jboss}/bin/wsprovide${script.suffix}">
+      <arg value="-o" />
+      <arg value="${dir.alt02}/wsprovide" />
+      <arg value="-c" />
+      <arg value="${dir.alt02}/classes" />
+      <arg value="-w" />
+      <arg value="org.jbia.ws.SalesTax" />
+    </exec>
+    <!-- Set the URL in the generated WSDL -->
+    <copy todir="${dir.alt02}/wsdl">
+      <fileset file="${dir.alt02}/wsprovide/SalesTaxService.wsdl" />
+      <filterchain>
+        <replacestring from="REPLACE_WITH_ACTUAL_URL"
+                       to="http://localhost:8080/salestax/tax"
+        />
+      </filterchain>
+    </copy>
+    <!-- Use wsconsume to generate the stubs from the WSDL. -->
+    <exec executable="${home.jboss}/bin/wsconsume${script.suffix}">
+      <arg value="-o" />
+      <arg value="${dir.alt02}/wsconsume" />
+      <arg value="-k" />
+      <arg value="${dir.alt02}/wsdl/SalesTaxService.wsdl" />
+    </exec>
+    <!-- Gather the Java source files, required by the server, to compile. -->
+    <copy todir="${dir.gen}">
+      <fileset dir="${dir.alt02}/wsconsume"
+               includes="**/*.java"
+               excludes="**/SalesTaxService.java,**/ObjectFactory.java"
+      />
+      <fileset dir="${dir.alt}/${alt.target}/java" />
+    </copy>
+    <property name="java.source" location="${dir.gen}" />
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+  <!-- Set these before the global properties are set. -->
+  <target name="init-pre">
+    <property name="book.chapter" value="Ch 09 - Configuring Web Services" />
+    <property name="app.name" value="salestax" />
+  </target>
+
+  <!-- Set these after the global properties are set. -->
+  <target name="init-post">
+    <!--
+      Set properties related to alternative directories used by some of the
+      examples.
+    -->
+    <property name="dir.alt.keystore" location="${dir.alt}/keystore" />
+
+    <!-- The location of the doc-style SOAP binding files for the C# client. -->
+    <property name="dir.soapdoc" location="${dir.alt}/04/csharp" />
+
+    <!-- The standard stubs for the client, they are rpc-binding specific. -->
+    <property name="dir.client.stubs" location="${dir.src}/client/stubs" />
+
+    <!-- Specify optional processing required -->
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      application server for use with the examples.
+    ============================================================================
+  -->
+
+  <!-- Do this after the application server has been initialized. -->
+  <target name="jboss-post"
+          depends="jboss-post-07, jboss-post-logging, jdk6-check, fix-wsrunclient"
+  />
+
+  <!-- Replace the users and roles properties files. -->
+  <target name="jboss-post-07" if="jboss.users.roles">
+    <copy todir="${dir.server}" overwrite="true" verbose="true">
+      <fileset dir="${dir.alt}/jboss" />
+    </copy>
+  </target>
+
+  <!-- Turn trace logging on so that you can see the messages. -->
+  <target name="jboss-post-logging">
+    <copy todir="${dir.output}/jboss/conf">
+      <fileset file="${dir.server}/conf/jboss-log4j.xml" />
+      <filterchain>
+        <!--
+          This replacestring action leaves a dangling comment ending
+          (dash-dash-greaterthan), and log4j complains about it, but the
+          settings all work correctly.
+        -->
+        <replacestring from="Enable JBossWS message tracing"
+                       to="Enable JBossWS message tracing -->"
+        />
+        <!--
+          It does not help to turn the ws message logging on if the threshold
+          level is set to DEBUG (which it is by default), so also set the
+          threshold to TRACE.
+        -->
+        <replacestring from="${jboss.server.log.threshold}"
+                       to="TRACE"
+        />
+      </filterchain>
+    </copy>
+    <copy todir="${dir.server}" overwrite="true" verbose="true">
+      <fileset dir="${dir.output}/jboss" />
+    </copy>
+  </target>
+
+  <!--
+    There are two binary downloads for JBoss AS, one for JDK5 the other for
+    JDK6. If you use JDK5 and download the JDK6 binary for JBoss AS, it will
+    not run because the class files are at the wrong level. However, if you
+    download the JDK5 binary of JBoss AS and use JDK6, everything will work
+    until you try to run your first web service. This target checks that you
+    are not running the JDK5 binary of JBoss AS with JDK6.
+  -->
+  <target name="jdk6-check">
+    <available classname="javax.xml.soap.SOAPMessage" property="using.jdk6" />
+    <available file="${home.jboss}/lib/endorsed/jbossws-native-jaxws.jar"
+               property="downloaded.jdk6"
+    />
+    <condition property="jdk6.mismatch">
+      <and>
+        <not>
+          <isset property="downloaded.jdk6"/>
+        </not>
+        <isset property="using.jdk6"/>
+      </and>
+    </condition>
+    <fail if="jdk6.mismatch"
+          message="It appears that you have downloaded the JDK5 binary for JBoss AS, but are running JDK6. You must use the JDK6 binary of JBoss AS with JDK 6."
+    />
+  </target>
+
+  <!--
+    KLUDGE: The wsrunclient.bat file that ships with 5.0 GA has a bug and does
+    not work. When you run it, you get this error:
+      = was unexpected at this time.
+    The defect is easy to fix - change this line:
+      if "%JBOSS_HOME%" = "" set JBOSS_HOME=%DIRNAME%\..
+    to read:
+      if "%JBOSS_HOME%" == "" set JBOSS_HOME=%DIRNAME%\..
+    Note that doing this for every target is not a problem - the faulty line
+    will be fixed the first time through, and after that the corrected file
+    will be copied as is. We could, instead, provide some kind of flag to
+    indicate we already fixed this, but we are lazy...
+  -->
+  <target name="fix-wsrunclient">
+    <mkdir dir="${dir.output}/jboss" />
+    <copy todir="${dir.output}/jboss">
+      <fileset dir="${home.jboss}/bin" includes="wsrunclient.bat" />
+      <filterchain>
+        <replacestring from="if &quot;%JBOSS_HOME%&quot; = &quot;&quot;"
+                       to="if &quot;%JBOSS_HOME%&quot; == &quot;&quot;"
+        />
+      </filterchain>
+    </copy>
+    <copy todir="${home.jboss}/bin" overwrite="true">
+      <fileset dir="${dir.output}/jboss" />
+    </copy>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to compile, package and
+      deploy the examples.
+    ============================================================================
+  -->
+
+  <!-- Some of the variants require other files to be used. -->
+  <target name="pre-war" depends="pre-war-02, pre-war-07, pre-war-security" />
+  <target name="pre-jar" depends="pre-jar-security" />
+
+  <!-- Include the WSDL file generated by wsprovide. -->
+  <target name="pre-war-02" if="alt.02">
+    <copy todir="${dir.output}/${war.name}/WEB-INF/wsdl">
+      <fileset file="${dir.alt02}/wsdl/SalesTaxService.wsdl" />
+    </copy>
+    <!-- Alter the servlet class name in web.xml -->
+    <copy todir="${dir.output}/${war.name}" overwrite="true">
+      <fileset dir="${dir.main}/webapp" includes="**/web.xml" />
+      <filterchain>
+        <replacestring from="org.jbia.ws.SalesTax"
+                       to="org.jbia.ws.SalesTaxImpl"
+        />
+      </filterchain>
+    </copy>
+  </target>
+
+  <!-- Include the files needed to secure the Web service. -->
+  <target name="pre-war-07" if="alt.07">
+    <copy todir="${dir.output}/${war.name}" overwrite="true" verbose="true">
+      <fileset dir="${dir.alt}/${alt.target}/webapp" />
+    </copy>
+  </target>
+
+  <!-- Include the files needed to encrypt the POJO Web service. -->
+  <target name="pre-war-security" if="need.wssecurity">
+    <copy todir="${dir.output}/${war.name}/WEB-INF"
+          overwrite="true"
+          verbose="true"
+    >
+      <fileset dir="${dir.alt}/wssecurity/${need.wssecurity}/server" />
+    </copy>
+  </target>
+
+  <!-- Include the files needed to encrypt the EJB Web service. -->
+  <target name="pre-jar-security" if="need.wssecurity">
+    <copy todir="${dir.classes}/META-INF" overwrite="true" verbose="true">
+      <fileset dir="${dir.alt}/wssecurity/${need.wssecurity}/server"
+               includes="**/*.xml"
+      />
+      <filterchain>
+        <replacestring from="WEB-INF" to="META-INF" />
+      </filterchain>
+    </copy>
+    <!-- Do not run the binary files through the filter... -->
+    <copy todir="${dir.classes}/META-INF" overwrite="true" verbose="true">
+      <fileset dir="${dir.alt}/wssecurity/${need.wssecurity}/server"
+               excludes="**/*.xml"
+      />
+    </copy>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to compile and package
+      the clients. The steps are:
+      1) Using wsprovide, generate the WSDL from the web service class files.
+      2) Using wsconsume, generate the stubs from the WSDL.
+      3) Compile the stubs and client, and package into a jar.
+      4) Create the scripts used to run the client.
+    ============================================================================
+  -->
+
+  <!-- Builds and packages the Java client and its scripts. -->
+  <target name="client" depends="client-config">
+    <jbia.jar destfile="${dir.dist}/client.jar">
+      <fileset dir="${dir.output}/client" />
+    </jbia.jar>
+    <antcall target="g-script">
+      <param name="need.scripts" value="true" />
+      <param name="dir.script" value="${dir.src}/client/script" />
+      <param name="jar.path" location="${dir.dist}/client.jar" />
+    </antcall>
+  </target>
+
+  <!--
+    Generates the WSDL and then the stubs. Note that the web service classes
+    should have been compiled by the time we get here.
+  -->
+  <target name="client-stubs">
+    <property name="dir.client.gen" location="${dir.output}/client-gen" />
+    <!-- Use wsprovide to generate the WSDL. -->
+    <condition property="script.suffix" value=".sh">
+      <os family="unix" />
+    </condition>
+    <condition property="script.suffix" value=".bat">
+      <os family="windows" />
+    </condition>
+    <exec executable="${home.jboss}/bin/wsprovide${script.suffix}">
+      <arg value="-o" />
+      <arg value="${dir.client.gen}/wsprovide" />
+      <arg value="-c" />
+      <arg value="${dir.classes}" />
+      <arg value="-w" />
+      <arg value="org.jbia.ws.SalesTax" />
+    </exec>
+    <!-- Set the URL in the generated WSDL -->
+    <copy todir="${dir.client.gen}/wsdl">
+      <fileset file="${dir.client.gen}/wsprovide/SalesTaxService.wsdl" />
+      <filterchain>
+        <replacestring from="REPLACE_WITH_ACTUAL_URL"
+                       to="http://localhost:8080/salestax/tax"
+        />
+      </filterchain>
+    </copy>
+    <!-- Use wsconsume to generate the stubs from the WSDL. -->
+    <exec executable="${home.jboss}/bin/wsconsume${script.suffix}">
+      <arg value="-o" />
+      <arg value="${dir.client.gen}/wsconsume" />
+      <arg value="-k" />
+      <arg value="${dir.client.gen}/wsdl/SalesTaxService.wsdl" />
+    </exec>
+  </target>
+
+  <!--
+    Place the client code and stubs in the same directory because the global
+    compile target expects it that way.
+  -->
+  <target name="client-gather" depends="client-stubs">
+    <copy todir="${dir.client.gen}/java">
+      <fileset dir="${dir.src}/client/java" />
+      <fileset dir="${dir.client.gen}/wsconsume" includes="**/*.java" />
+    </copy>
+  </target>
+
+  <!-- Use the global compile target to build the client. -->
+  <target name="client-compile" depends="client-gather">
+    <antcall target="g-compile">
+      <param name="dir.java" value="${dir.client.gen}/java" />
+      <param name="dir.gen" value="${dir.client.gen}/gen" />
+      <param name="java.source" value="${dir.client.gen}/gen" />
+      <param name="dir.classes" value="${dir.output}/client" />
+    </antcall>
+  </target>
+
+  <!--
+    Most clients (those not using WSSecurity) require the basic client config
+    file. This should be a temporary situation with AS 5.0.0.CR1 - the betas
+    did not require this file and the GA might not require it either. Therefore,
+    because the need for this file could be transitional, this config file is
+    not mentioned in the text of the book.
+  -->
+  <target name="client-config"
+          depends="client-compile, client-alt"
+          unless="need.wssecurity"
+  >
+    <copy todir="${dir.output}/client">
+      <fileset dir="${dir.src}/client/resources" />
+    </copy>
+  </target>
+
+  <!-- Some client variations require the WSSecurity files. -->
+  <target name="client-alt" if="need.wssecurity">
+    <copy todir="${dir.output}/client/META-INF" overwrite="true" verbose="true">
+      <fileset dir="${dir.alt}/wssecurity/${need.wssecurity}/client" />
+    </copy>
+  </target>
+
+  <!--
+    Gathers the files for the C# client. The resulting files are suitable for
+    use within Visual Studio 2005.
+  -->
+  <target name="c#-client" depends="c#-base, c#-soapdoc" />
+  <target name="c#-base">
+    <copy todir="${dir.output}/csharp">
+      <fileset dir="${dir.src}/csharp" />
+    </copy>
+  </target>
+  <target name="c#-soapdoc" if="use.soapdoc">
+    <copy todir="${dir.output}/csharp" overwrite="true">
+      <fileset dir="${dir.soapdoc}" />
+    </copy>
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <target description="Removes all generated files."
+          name="clean"
+          depends="g-clean"
+  />
+  <target description="Removes all generated files and the JBoss AS configuration."
+          name="clean-all"
+          depends="g-clean-all"
+  />
+
+</project>

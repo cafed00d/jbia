@@ -1,0 +1,429 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2007, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                  Ch 7 - Configuring Enterprise Applications
+
+  This Ant build script is used to build and deploy various examples
+  from chapter 7.
+
+============================================================================ -->
+<project name="ch07" basedir=".">
+
+	<!-- Specifies the location of the global include and properties files -->
+	<property name="dir.ch00" location="../ch00" />
+
+	<!-- Get properties related to the user's environment. -->
+	<property file="${dir.ch00}/build.properties" />
+
+	<!-- Import various properties and targets -->
+	<import file="${dir.ch00}/build-include.xml" />
+	<import file="${dir.ch00}/ssl-include.xml" />
+
+	<!-- Override help target from include script to avoid confusion. -->
+	<target name="help">
+		<echo>usage: ant NN</echo>
+		<echo>where NN is 01 through 02</echo>
+		<echo>Enter "ant -p" for full target list.</echo>
+	</target>
+
+	<!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Note that only one example can be built at a time because each target
+      removes the "target" directory.
+    ============================================================================
+    -->
+
+	<target description="(7.2) Builds and packages a simple EJB greeting application"
+	        name="01"
+	        depends="init-01, g-init, g-reset-jboss, 01-package, g-deploy-jar" />
+
+	<target description="(7.4.1) Builds and packages a series of simple beans that bind into JNDI in different ways"
+	        name="02"
+	        depends="init-02, g-init, g-reset-jboss, 02-package, g-deploy-jar" />
+
+	<target description="(7.5.1) Creates a Hibernate web application whose Session is injected into the Servlet"
+	        name="03"
+	        depends="init-03, g-init, g-reset-jboss, 03-package, g-deploy-ear, g-reset-db" />
+
+	<target description="(7.6) Builds and packages a calculator application that demonstrates the use of JMX service objects"
+	        name="04"
+	        depends="init-04, g-init, g-reset-jboss, 04-package, g-deploy-ear" />
+
+	<target description="(7.7) Builds and packages a simple EJB greeting application that communicates over an RMI transport"
+	        name="05"
+	        depends="init-05, g-init, g-reset-jboss, 05-package, g-deploy-jar" />
+
+	<target description="(7.8.1) Builds and packages an interest calculator with EJB security annotations enabled"
+	        name="06"
+	        depends="init-06, g-init, g-reset-jboss, 06-package, g-deploy-ear" />
+
+	<target description="(7.8.2) Builds and packages an interest calculator with EJB XML-based security enabled"
+	        name="07"
+	        depends="init-07, g-init, g-reset-jboss, 07-package, g-deploy-ear" />
+
+	<target description="(7.8.4) Enables secure communication for an EJB greeting application"
+	        name="08"
+	        depends="init-08, g-init, g-reset-jboss, 08-package, ssl, s-create-client-truststore, s-deploy-server-certificates, g-deploy-jar" />
+
+	<!-- 
+	=========================================================================
+    This set of variations of the major targets only compile and package the
+    clients, EJBs or POJOs. Initialization of the application server and
+    database, or deploying the EJB or POJO, is left up to you.
+    ============================================================================
+    -->
+	<target name="01-package"
+	        depends="init-01, g-init, g-clean, g-jboss-config, g-jar" />
+	<target name="02-package"
+	        depends="init-02, g-init, g-clean, g-jboss-config, g-jar" />
+	<target name="03-package"
+	        depends="init-03, g-init, g-clean, g-jboss-config, g-war, har, video-ejb-jar, g-ear" />
+	<target name="04-package"
+	        depends="init-04, g-init, g-clean, g-jboss-config, calculator-war, calculator-ejb-jar, g-ear" />
+	<target name="05-package"
+	        depends="init-05, g-init, g-clean, g-jboss-config, g-jar" />
+	<target name="06-package"
+	        depends="init-06, g-init, g-clean, g-jboss-config, calculator-war, calculator-ejb-jar, resource-jar, g-ear" />
+	<target name="07-package"
+	        depends="init-07, g-init, g-clean, g-jboss-config, calculator-war, calculator-ejb-jar, resource-jar, g-ear" />
+	<target name="08-package"
+	        depends="init-08, g-init, g-clean, g-jboss-config, g-jar" />
+
+	<!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+	<target name="init-01">
+		<property name="app.name" value="greeter" />
+		<property name="dir.main" location="src/sampleapp" />
+		<property name="need.resources" value="true" />
+		<property name="alt.target" value="01" />
+	</target>
+	<target name="init-02">
+		<property name="app.name" value="messageprinter" />
+		<property name="dir.main" location="src/jndibinding" />
+		<property name="need.resources" value="true" />
+	</target>
+	<!-- Properties specific to the Hibernate archive example -->
+	<target name="init-03">
+		<property name="dir.main" location="src/hibernate-injection" />
+		<property name="app.name" value="video" />
+		<property name="include.classes" value="**/VideoServlet.class" />
+		<property name="need.resources" value="true" />
+	</target>
+	<target name="init-04">
+		<property name="app.name" value="calculator" />
+		<property name="dir.main" location="src/jmxservice" />
+	</target>
+	<target name="init-05">
+		<property name="app.name" value="greeter" />
+		<property name="dir.main" location="src/sampleapp" />
+		<property name="need.resources" value="true" />
+		<property name="alt.target" value="05" />
+		<property name="copy-alt" value="true" />
+	</target>
+	<target name="init-06">
+		<property name="app.name" value="calculator" />
+		<property name="dir.main" location="src/ejbsecurity" />
+		<property name="alt.target" value="06" />
+		<property name="dir.resources"
+		          value="src/alt/${alt.target}/resources" />
+	</target>
+	<target name="init-07">
+		<property name="app.name" value="calculator" />
+		<property name="dir.main" location="src/ejbsecurity" />
+		<property name="alt.target" value="07" />
+		<property name="dir.resources"
+		          value="src/alt/${alt.target}/resources" />
+	</target>
+	<target name="init-08">
+		<property name="app.name" value="greeter" />
+		<property name="dir.main" location="src/sampleapp" />
+		<property name="alt.target" value="08" />
+		<property name="need.resources" value="true" />
+	</target>
+
+	<!--
+	    ============================================================================
+	      The following targets do the extra work necessary to compile, package and
+	      deploy the resource JAR archive that contains the dynamic login configuration info.
+	    ============================================================================
+	  -->
+
+	<!-- Packages the resource JAR that contains the dynamic login configuration. -->
+	<target name="resource-jar" depends="g-create-dist, g-resource, pre-jar">
+        <jbia.jar destfile="${resourcejar.path}">
+          <fileset dir="${dir.classes}" includes="**/dynamic-login-config.xml,**/my*.properties" />
+        </jbia.jar>
+	</target>
+
+	<!--
+    ============================================================================
+      The following targets run the client Java applications for the various
+      examples
+    ============================================================================
+    -->
+	<target name="01-client" depends="init-01, g-init">
+		<path id="classpath.runtime">
+			<fileset dir="${home.jboss}/client" includes="**/*" />
+			<fileset dir="${home.jboss}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/deployers/ejb3.deployer"
+			         includes="**/*.jar" />
+			<fileset dir="${dir.dist}" includes="${jar.name}" />
+		</path>
+		<java classpathref="classpath.runtime"
+		      classname="com.manning.jbia.Client" />
+	</target>
+	<target name="02-client" depends="init-02, g-init">
+		<path id="classpath.runtime">
+			<fileset dir="${home.jboss}/client" includes="**/*" />
+			<fileset dir="${home.jboss}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/deployers/ejb3.deployer"
+			         includes="**/*.jar" />
+			<fileset dir="${dir.dist}" includes="${jar.name}" />
+		</path>
+		<java classpathref="classpath.runtime"
+		      classname="com.manning.jbia.jndibinding.Client" />
+	</target>
+	<target name="05-client" depends="init-05, g-init">
+		<path id="classpath.runtime">
+			<fileset dir="${home.jboss}/client" includes="**/*" />
+			<fileset dir="${home.jboss}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/deployers/ejb3.deployer"
+			         includes="**/*.jar" />
+			<fileset dir="${dir.dist}" includes="${jar.name}" />
+		</path>
+		<java classpathref="classpath.runtime"
+		      classname="com.manning.jbia.Client" />
+	</target>
+	<target name="06-client" depends="init-06, g-init">
+		<path id="classpath.runtime">
+			<fileset dir="${home.jboss}/client" includes="**/*" />
+			<fileset dir="${home.jboss}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/deployers/ejb3.deployer"
+			         includes="**/*.jar" />
+			<fileset dir="${dir.dist}" includes="${jar.name}" />
+		</path>
+		<java classpathref="classpath.runtime"
+		      classname="com.manning.jbia.ejbsecurity.client.Client"
+			  fork="true">
+			  <jvmarg value="-Djava.security.auth.login.config=${dir.gen}/auth.conf"/>
+		</java>
+	</target>
+	<target name="07-client" depends="init-07, g-init">
+		<path id="classpath.runtime">
+			<fileset dir="${home.jboss}/client" includes="**/*" />
+			<fileset dir="${home.jboss}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/deployers/ejb3.deployer"
+			         includes="**/*.jar" />
+			<fileset dir="${dir.dist}" includes="${jar.name}" />
+			<fileset dir="${dir.dist}" includes="client.jar" />
+		</path>
+		<java classpathref="classpath.runtime"
+		      classname="com.manning.jbia.ejbsecurity.client.Client" 
+			  fork="true">
+			  <jvmarg value="-Djava.security.auth.login.config=${dir.gen}/auth.conf"/>
+		</java>
+	</target>
+	<target name="08-client" depends="init-08, g-init, s-init">
+		<path id="classpath.runtime">
+			<fileset dir="${home.jboss}/client" includes="**/*" />
+			<fileset dir="${home.jboss}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/lib" includes="**/*.jar" />
+			<fileset dir="${dir.server}/deployers/ejb3.deployer"
+			         includes="**/*.jar" />
+			<fileset dir="${dir.dist}" includes="${jar.name}" />
+		</path>
+		<echo message="java -Djavax.net.ssl.trustStrore=${dir.keystore}/${ssl.client.truststore.filename} -Djavax.net.ssl.trustStorePassword=${ssl.client.truststore.keystorepass} com.manning.jbia.Client" />
+		<java classpathref="classpath.runtime"
+		      classname="com.manning.jbia.Client"
+		      fork="true">
+			<jvmarg value="-Djavax.net.ssl.trustStore=${dir.keystore}/${ssl.client.truststore.filename}" />
+			<jvmarg value="-Djavax.net.ssl.trustStorePassword=${ssl.client.truststore.keystorepass}" />
+		</java>
+	</target>
+
+
+	<!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+	<!-- Set these before the global properties are set. -->
+	<target name="init-pre">
+		<property name="jboss.server" value="enterprise" />
+		<property name="book.chapter"
+		          value="Ch 06 - Configuring Enterprise Applications" />
+	</target>
+
+	<!-- Set these after the global properties are set. -->
+	<target name="init-post">
+		<property name="har.name" value="video.har" />
+		<property name="har.path" location="${dir.dist}/${har.name}" />
+		<property name="ejbjar.name" value="video.jar" />
+		<property name="ejbjar.path" location="${dir.dist}/${ejbjar.name}" />
+		<!-- Specify optional processing required. -->
+		<property name="need.preprocess" value="true" />
+		<property name="security.realm" value="simple-security-domain" />
+		<property name="resourcejar.name" value="dynamic-login.jar" />
+		<property name="resourcejar.path" location="${dir.dist}/${resourcejar.name}" />
+	</target>
+
+
+	<!--
+	    ============================================================================
+	      The following targets do the extra work necessary to initialize the
+	      application server for use with the examples.
+	    ============================================================================
+	  -->
+
+	<!-- Do this after the application server has been initalized. -->
+	<target name="jboss-post" if="copy-alt">
+		<copy todir="${dir.server}" overwrite="true" verbose="true">
+			<fileset dir="${dir.alt}/${alt.target}/jboss" />
+		</copy>
+	</target>
+
+	<!--
+	    ============================================================================
+	      The following targets do the extra work necessary to compile, package and
+	      deploy the EJB examples.
+	    ============================================================================
+	-->
+
+	<!-- Packages the calculator EAR file. -->
+	<target name="calculator-ejb-jar">
+		<antcall target="g-jar">
+			<param name="include.classes"
+			       value="**/ejb/*.class, auth.conf, *.conf, jndi.properties, *.properties, **/client/*.class,  META-INF/**" />
+		</antcall>
+	</target>
+	
+	<!-- Packages the calculator client -->
+	<target name="calculator-client">
+		<antcall target="g-jar">
+			<param name="include.classes"
+			       value="**/client/*.class, jndi.properties" />
+			<param name="jar.path"
+			       value="${dir.dist}/client.jar" />
+		</antcall>
+	</target>
+
+	<!-- Packages the calculator WAR file. -->
+	<target name="calculator-war">
+		<path id="classpath.altered">
+			<fileset dir="${home.jboss}/client" includes="**/*.jar" />
+			<fileset dir="${home.jboss}/server/${jboss.server}/lib"
+			         includes="**/*.jar" />
+			<fileset dir="${home.jboss}/server/${jboss.server}/deploy/jbossweb.sar/jsf-libs"
+			         includes="**/*.jar" />
+		</path>
+		<antcall target="g-war">
+			<reference refid="classpath.altered" torefid="classpath" />
+			<param name="include.classes" value="**/CalculatorViewBean.class" />
+		</antcall>
+	</target>
+
+	<!--
+	    ============================================================================
+	      The following targets do the extra work necessary to compile, package and
+	      deploy the EJB JAR for the video application (hibernate injection).
+	    ============================================================================
+	  -->
+
+	<target name="video-ejb-jar">
+		<antcall target="g-jar">
+			<param name="jar.path" value="${ejbjar.path}" />
+			<param name="include.classes"
+			       value="**/VideoService.class,**/VideoServiceImpl.class" />
+		</antcall>
+	</target>
+
+	<target name="deploy-video-ejb-jar">
+		<copy todir="${dir.deploy}" file="${ejbjar.path}" verbose="true" />
+	</target>
+
+	<!--
+	    ============================================================================
+	      The following targets do the extra work necessary to compile, package and
+	      deploy the Hibernate archive for the video application (hibernate injection).
+	    ============================================================================
+	  -->
+
+	<!-- Packages the Hibernate archive. -->
+	<target name="har">
+		<antcall target="g-jar">
+			<param name="jar.path" value="${har.path}" />
+			<param name="include.classes"
+			       value="**/Video.class,**/video-hibernate.xml,**/Video.hbm.xml" />
+		</antcall>
+	</target>
+
+	<!-- Deploys the HAR file to the application server. -->
+	<target name="deploy-har" unless="no.deploy">
+		<copy todir="${dir.deploy}" file="${har.path}" verbose="true" />
+	</target>
+
+	<!-- 
+	===================================================================== 
+	Targets that set up server and client for SSL. 
+	===================================================================== 
+	-->
+	<target name="ssl"
+	        depends="s-init, ssl-jboss-service, s-create-server-certificate" />
+
+	<!-- Appends the SSL-related information to the jboss-service.xml config file. -->
+	<target name="ssl-jboss-service">
+		<copy todir="${dir.config}">
+			<fileset dir="src/alt/${alt.target}/jboss" includes="**/*"/>
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+		<copy todir="${dir.server}" overwrite="true">
+			<fileset dir="${dir.config}" includes="**/*" />
+		</copy>
+	</target>
+
+	<!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+    -->
+
+	<target description="Removes all generated files."
+	        name="clean"
+	        depends="g-clean" />
+	<target description="Removes all generated files, the JBoss AS configuration and the database."
+	        name="clean-all"
+	        depends="g-clean-all" />
+
+</project>

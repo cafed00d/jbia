@@ -1,0 +1,124 @@
+<!--
+#  Copyright 2008, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../image/jbia.css" type="text/css" />
+</head>
+
+<body>
+
+<h1>Overview</h1>
+<p>This document describes the source code the accompanies the book, JBoss
+in Action, and covers such topics as how to build and run the examples.</p>
+<h2>Directory Overview</h2>
+<p>The source code comes as a zip file, which when unzipped creates a
+directory named <code>jbia-src</code> that contains the following:</p>
+<ul>
+  <li>index.html - the main page of this documentation.</li>
+  <li>ch00 - a directory containing common files used by the documentation
+  and all of the examples.</li>
+  <li>ch01..ch15 - directories which contain the script, source, and other
+  files necessary to run the example applications or application server
+  configurations described in the chapters of the book.</li>
+</ul>
+<h2>Build Preparation</h2>
+<p>You will need to download and install several things before you can do
+any of the builds:</p>
+<ul>
+  <li>JBoss Application Server 5.0.0.GA. Note that there are two binary
+  downloads for JBoss AS - one if you are using JDK 5 and another if you are
+  using JDK 6 - make sure you download the one that matches the JDK you are
+  using. Also, if you download the one for JDK 6, rename the downloaded zip file
+  from <code>jboss-5.0.0.GA-jdk6.zip</code> to <code>jboss-5.0.0.GA.zip</code>.</li>
+  <li>A 1.5 or 1.6 JDK. We used JDK 1.5.0_16 and 1.6.0_07 (aka 6u7), but
+  the latest JDK should work fine. If you are using JDK 1.6, make sure it is at
+  least 1.6.0_04, earlier versions cause problems.</li>
+  <li>Apache Ant 1.7.1</li>
+  <li>(optional) JBoss Portal 2.6.6 or 2.7.0 binary (required for the Portal
+  examples)</li>
+  <li>(optional) JBoss Application Server 4.2.3 (required for the Portal
+  examples)</li>
+  <li>(optional) JBoss Native 2.0.6 (required for some of the production
+  examples)</li>
+  <li>(optional) MySQL 5.x or PostgreSQL 8.x (if you want to use a database
+  other than Hypersonic, required for some examples)</li>
+</ul>
+<p>The file <code>ch00/build.properties</code> contains global properties
+that you must set, such as the location of the JBoss Application Server. That
+file contains comments explaining each setting. Change each setting to reflect
+your environment and save the file before building any of the examples.</p>
+<h2>Build Overview</h2>
+<p>Once the necessary software has been downloaded and installed, to build
+any of the examples:</p>
+<ol>
+  <li>Open a command window or terminal</li>
+  <li>Change to the desired chapter directory, for example: <code>cd
+  ch08</code></li>
+  <li>Run the build, identifying the example to build. For example, to
+  build the first example, enter: <code>ant 01</code></li>
+</ol>
+<p>In general, most of the examples:</p>
+<ol>
+  <li>Create a new server configuration</li>
+  <li>Update that configuration to reflect the configuration settings for
+  that example</li>
+  <li>Compile the example source code</li>
+  <li>Deploy the example application</li>
+  <li>Optionally initialize the database</li>
+</ol>
+<p>Make sure that the application server is not running before doing any of
+the builds. Once the build is done, you can run the application server
+configuration created and then try out the application or configuration changes.
+</p>
+<p>Click on the chapter links to the left to see more details regarding the
+examples and how to use them.</p>
+<h2>Build Trivia</h2>
+<p>Do not run the build in <code>ch00</code>, that build file is a global
+include file used by the other builds.</p>
+<p>For any of the builds, run Ant, passing the <code>-p</code> option (<code>ant
+-p</code>), to get a list of valid targets. Each <dfn>example target</dfn> is a
+two-digit number, such as <code>04</code>, and the description for the target
+includes the section in the book that corresponds to that example.</p>
+<p>Do not run combinations of targets. For example, do not run <code>ant
+clean 02</code>. If you do this, the build properties will not be properly established
+and the build could fail or produce unexpected results. Instead, run each target
+separately. Note, however, that every <dfn>example target</dfn> performs a "clean"
+operation as one of its first steps.</p>
+<p>You can build only one example at a time for each chapter. For example,
+if you build messaging example 04, and then build messaging example 05, the 04
+example, and even the application server configuration and database, are removed
+before example 05 is built. Why did we do it this way? Because the examples for
+a chapter tend to be variations of a theme and thus typically cannot both be
+present at the same time. There are some exceptions and those are noted in the
+description of the examples.</p>
+<p>The source files and build scripts are well commented.</p>
+<p>When a database is created, a user named jbossinaction with a password
+jbossinactionpwd is created as the owner of that database. The name of the
+database depends on the example being built, and typically is similar to the
+name of the application server configuration. For example, for the portal
+chapter, the application server configuration is named portal and the database
+is named portaldb.</p>
+<p>Verbose build output is logged to the <code>build.log</code> file. In
+addition, the properties used by the build are dumped to the files <code>properties.log</code>
+and <code>dbproperties.log</code>.</p>
+<p>This readme text is best viewed using Firefox.</p>
+<hr />
+<p align="center">&copy; 2008, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>

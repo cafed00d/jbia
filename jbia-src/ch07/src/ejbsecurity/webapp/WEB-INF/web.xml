@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	*******************************************************************************
+	*  Copyright 2007, Javid Jamae and Peter Johnson
+	* 
+	*  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+	*  use this file except in compliance with the License. You may obtain a copy
+	*  of the License at
+	* 
+	*     http://www.apache.org/licenses/LICENSE-2.0
+	*  
+	*  Unless required by applicable law or agreed to in writing, software
+	*  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+	*  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+	*  License for the specific language governing permissions and limitations
+	*  under the License.
+	*******************************************************************************
+-->
+
+<web-app version="2.5"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<display-name>Calculator</display-name>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.faces</url-pattern>
+	</servlet-mapping>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/Calculator</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local-home></local-home>
+		<local>com.manning.jbia.ejbsecurity.ejb.Calculator</local>
+	</ejb-local-ref>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>HtmlAdaptor</web-resource-name>
+			<url-pattern>*.faces</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>teller</role-name>
+			<role-name>bank-manager</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<form-login-page>/restricted/login.html</form-login-page>
+			<form-error-page>
+				/restricted/bad-login.html
+			</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<security-role>
+		<role-name>admin</role-name>
+	</security-role>
+	<security-role>
+		<role-name>teller</role-name>
+	</security-role>
+	<security-role>
+		<role-name>bank-manager</role-name>
+	</security-role>
+ 
+</web-app>

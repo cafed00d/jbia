@@ -1,0 +1,89 @@
+init-log:  duration 0 seconds
+
+init-pre:
+init-pre:  duration 0 seconds
+
+g-init-src:
+Override ignored for property "dir.main"
+[available] Found: src\sampleapp\resources
+Override ignored for property "need.resources"
+[available] Unable to find src\sampleapp\jboss
+[available] Unable to find src\sampleapp\script
+g-init-src:  duration 0 seconds
+
+g-init-out:
+Override ignored for property "app.name"
+g-init-out:  duration 0 seconds
+
+g-init-jboss:
+Override ignored for property "jboss.server"
+g-init-jboss:  duration 0 seconds
+
+g-init-classpath:
+g-init-classpath:  duration 0 seconds
+
+g-init-db:
+Override ignored for property "database.type"
+g-init-db:  duration 0 seconds
+
+g-db-props-mysql:
+Skipped because property 'database.mysql' not set.
+g-db-props-mysql:  duration 0 seconds
+
+g-db-props-postgresql:
+Skipped because property 'database.postgresql' not set.
+g-db-props-postgresql:  duration 0 seconds
+
+g-db-props-hsqldb:
+Override ignored for property "database.type"
+Property "jboss.server.data.dir" has not been set
+Property "/" has not been set
+Property "/" has not been set
+g-db-props-hsqldb:  duration 0 seconds
+
+g-db-props:
+     [echo] Using hsqldb, database name is enterprisedb.
+g-db-props:  duration 0 seconds
+
+init-post:
+init-post:  duration 0 seconds
+
+g-init-general:
+[presetdef] defining preset jbia.jar
+g-init-general:  duration 0 seconds
+
+g-validate-jboss:
+[available] Found: c:\jbia-src\binaries\jboss-5.0.0.GA.zip
+g-validate-jboss:  duration 0 seconds
+
+g-validate-portal:
+Skipped because property 'need.portal' not set.
+g-validate-portal:  duration 0 seconds
+
+g-validate-db:
+Skipped because property 'need.database' not set.
+g-validate-db:  duration 0 seconds
+
+g-validate-native:
+Skipped because property 'need.native' not set.
+g-validate-native:  duration 0 seconds
+
+g-validate:
+g-validate:  duration 0 seconds
+
+g-init:
+g-init:  duration 0 seconds
+
+05-client:
+     [java] running com.manning.jbia.Client with default permissions (exit forbidden)
+     [java] Running in same VM Executing 'com.manning.jbia.Client'
+The ' characters around the executable and arguments are
+not part of the command.
+     [java] Hello, world!
+     [java] Hola, mundo!
+     [java] Salam, donya!
+     [java] Bonjour, monde!
+     [java] Ciao, mondo!
+05-client:  duration 4 seconds
+
+BUILD SUCCESSFUL

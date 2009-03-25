@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                    Ch 14 - Tuning the JBoss Application Server
+
+  This Ant build script is used to build and deploy various examples
+  from chapter 14.
+
+============================================================================ -->
+<project name="perf" default="help" basedir=".">
+
+  <!-- Specifies the location of the global include and properties files -->
+  <property name="dir.ch00" location="../ch00" />
+
+  <!-- Get properties related to the user's environment. -->
+  <property file="${dir.ch00}/build.properties" />
+
+  <!-- Import various properties and targets -->
+  <import file="${dir.ch00}/build-include.xml" />
+
+  <!-- Override help target from include script to avoid confusion. -->
+  <target name="help">
+    <echo>usage: ant NN</echo>
+    <echo>where NN is 01 through 02</echo>
+    <echo>Enter "ant -p" for full target list.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Unlike other chapters, there is only one target that builds a combined
+      example.
+    ============================================================================
+  -->
+  <target description="(14.5.1, 14.5.2) Creates an application server that uses suggested heap sizes, and has -verbose:gc set."
+          name="01"
+          depends="init-01, g-init, g-clean, g-reset-jboss, g-script"
+  />
+  <target description="(14.5.3) Creates an application that extracts garbage collection data."
+          name="02"
+          depends="02-package"
+  />
+
+
+  <!--
+    ============================================================================
+      This set of variations of the major targets compile, package and deploy
+      the application. Initialization of the application server and database, if
+      needed, is left up to you. You can avoid application deployment by
+      setting "-Dno.deploy" on the ant command line.
+    ============================================================================
+  -->
+  <target name="02-package"
+          depends="init-02, g-init, g-clean, g-jar, g-script"
+  />
+
+
+  <!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+
+  <target name="init-01">
+    <property name="alt.target" value="01" />
+    <property name="dir.main" location="src/heap" />
+  </target>
+
+  <!-- Properties specific to the GC analyzer utility -->
+  <target name="init-02">
+    <property name="alt.target" value="02" />
+    <property name="app.name" value="analyzer" />
+    <property name="dir.main" location="src/${app.name}" />
+    <!-- No need for JBoss AS classes for Analyzer -->
+    <property name="ignore.classpath" value="true" />
+    <path id="classpath" />
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+  <!-- Set these before the global properties are set. -->
+  <target name="init-pre">
+    <property name="book.chapter"
+              value="Ch 14 - Tuning the JBoss Application Server"
+    />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      application server.
+    ============================================================================
+  -->
+
+  <!-- Do this after the application server has been initalized. -->
+  <target name="jboss-post" depends="jboss-post-windows, jboss-post-linux" />
+  <target name="jboss-post-windows" if="os.windows">
+    <antcall target="copy-run">
+      <param name="param.run" value="run.bat" />
+    </antcall>
+    <copy file="${dir.dist}/run.bat" tofile="${home.jboss}/bin/run-perf.bat" />
+  </target>
+  <target name="jboss-post-linux" if="os.linux">
+    <antcall target="copy-run">
+      <param name="param.run" value="run.conf" />
+    </antcall>
+    <!-- Create a second run script, rather than replacing the existing one -->
+    <copy todir="${dir.dist}">
+      <fileset dir="${home.jboss}/bin" includes="run.sh" />
+      <filterchain>
+        <replacestring from="run.conf" to="run-perf.conf" />
+        <replacestring from="org.jboss.Main" to="org.jboss.Main -c perf" />
+        <deletecharacters chars="\r" />
+      </filterchain>
+    </copy>
+    <copy file="${dir.dist}/run.conf"
+          tofile="${home.jboss}/bin/run-perf.conf"
+          overwrite="true"
+    />
+    <copy file="${dir.dist}/run.sh"
+          tofile="${home.jboss}/bin/run-perf.sh"
+          overwrite="true"
+    />
+    <chmod perm="a+x">
+      <fileset dir="${home.jboss}/bin">
+        <include name="run-perf.*" />
+      </fileset>
+    </chmod>
+  </target>
+
+  <!--
+    We would prefer to create another script which sets the heap sizes and
+    then invokes the run script, but the run script also sets heap sizes and
+    the last heap size set wins. Therefore, it is necessary to modify the
+    existing run script. Note that this copy task depends on a very specific
+    heap setting currently in the run scripts; if those settings change this
+    task will not do what is intended.
+  -->
+  <target name="copy-run">
+    <copy todir="${dir.dist}">
+      <fileset dir="${home.jboss}/bin" includes="${param.run}" />
+      <filterchain>
+        <replacestring from="-Xms128m -Xmx512m"
+                       to="-Xms1200m -Xmx1200m -XX:NewSize=400M -XX:MaxNewSize=400M -XX:SurvivorRatio=32 -XX:+UseTLAB -XX:TLABSize=64K -verbose:gc"
+        />
+        <replacestring from="org.jboss.Main" to="org.jboss.Main -c perf" />
+      </filterchain>
+    </copy>
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <target description="Removes all generated files."
+          name="clean"
+          depends="g-clean"
+  />
+  <target description="Removes all generated files and the JBoss AS configuration."
+          name="clean-all"
+          depends="g-clean-all, clean-run"
+  />
+
+  <!-- Removes the run scripts we created. -->
+  <target name="clean-run">
+    <delete failonerror="false">
+      <fileset dir="${home.jboss}/bin" includes="run-perf.*" />
+    </delete>
+  </target>
+
+</project>
