@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<!-- 
+ *******************************************************************************
+ *  Copyright 2007, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                      Ch 5 - Configuring JBoss Web Server
+
+  This Ant build script is used to build and deploy various examples
+  from chapter 1.
+
+============================================================================ -->
+<project name="jbossweb" basedir=".">
+
+	<!-- Specifies the location of the global include and properties files -->
+	<property name="dir.ch00" location="../ch00" />
+
+	<!-- Get properties related to the user's environment. -->
+	<property file="${dir.ch00}/build.properties" />
+
+	<!-- Import various properties and targets -->
+	<import file="${dir.ch00}/build-include.xml" />
+
+	<!-- Override help target from include script to avoid confusion. -->
+	<target name="help">
+		<echo>usage: ant NN</echo>
+		<echo>where NN is 01</echo>
+		<echo>Enter "ant -p" for full target list.</echo>
+	</target>
+
+	<!--
+       ============================================================================
+       The major targets build everything needed for each example in the chapter.
+       Unlike other chapters, there is only one target that builds a combined
+       example.
+       ============================================================================
+    -->
+
+	<target description="(5.3.1) This target creates an application server configuration with a virtual host enabled and bind an application to it."
+	        name="01"
+	        depends="init-01, g-init, g-reset-jboss, 01-package, g-deploy-war" />
+	<target description="(5.3.2) This target creates a web application with an alternative context path."
+	        name="02"
+	        depends="init-02, g-init, g-reset-jboss, 02-package, g-deploy-war" />
+	<target description="(5.3.2) This target creates an enterprise application with an alternative context path"
+	        name="03"
+	        depends="init-03, g-init, g-reset-jboss, 03-package, g-deploy-ear" />
+	<target description="(5.6) This target creates a web application with some Tomcat valves enables."
+	        name="04"
+	        depends="init-04, g-init, g-reset-jboss, 04-package, g-deploy-war" />
+	<target description="(5.7) This target creates a JSF-based interest calculator."
+	        name="05"
+	        depends="init-05, g-init, g-reset-jboss, 05-package, g-deploy-ear" />
+
+
+	<!-- 
+	   =========================================================================
+       This set of variations of the major targets only compile and package the
+       clients, EJBs or POJOs. Initialization of the application server and
+       database, or deploying the EJB or POJO, is left up to you.
+       =========================================================================
+    -->
+
+	<target name="01-package"
+	        depends="g-init, g-clean, g-jboss-config, alt-01, add-virtual-host, g-war" />
+	<target name="02-package"
+	        depends="g-init, g-clean, g-jboss-config, g-war" />
+	<target name="03-package"
+	        depends="g-init, g-clean, g-jboss-config, calculator-war, calculator-ejb-jar, g-ear" />
+	<target name="04-package"
+	        depends="g-init, g-clean, g-jboss-config, g-war" />
+	<target name="05-package"
+	        depends="g-init, g-clean, g-jboss-config, calculator-war, calculator-ejb-jar, g-ear" />
+
+	<!--
+       ============================================================================
+       The following targets set properties that are specific to each example.
+       This must be done before the global initialization.
+       ============================================================================
+    -->
+	<target name="init-01">
+		<property name="alt.target" value="01" />
+		<property name="dir.main" location="src/virtualhost" />
+	</target>
+	<target name="init-02">
+		<property name="alt.target" value="02" />
+		<property name="dir.main" location="src/contextpath-web" />
+	</target>
+	<target name="init-03">
+		<property name="app.name" value="calculator" />
+		<property name="alt.target" value="03" />
+		<property name="dir.main" location="src/contextpath-enterprise" />
+	</target>
+	<target name="init-04">
+		<property name="alt.target" value="04" />
+		<property name="dir.main" location="src/valves" />
+	</target>
+	<target name="init-05">
+		<property name="app.name" value="calculator" />
+		<property name="alt.target" value="04" />
+		<property name="dir.main" location="src/jsfexample" />
+	</target>
+
+
+	<!--
+    ============================================================================
+      The following targets apply the configurations and variations, as defined
+      by each example.
+    ============================================================================
+    -->
+	<target name="alt-01">
+	</target>
+
+	<!-- 
+       ============================================================================
+       The following targets do the extra work necessary to initialize the 
+       properties used during the build.
+       ============================================================================
+    -->
+
+	<!-- Set these before the global properties are set. -->
+	<target name="init-pre">
+		<property name="jboss.server" value="web" />
+		<property name="book.chapter"
+		          value="Ch 05 - Configuring JBoss Web Server" />
+		<property name="app.name" value="hello" />
+	</target>
+
+	<!-- Set these after the global properties are set. -->
+	<target name="init-post">
+		<!-- Specify optional processing required. -->
+		<property name="dir.jbossweb"
+		          location="${dir.server}/deploy/jbossweb.sar" />
+	</target>
+
+	<!--
+	    ============================================================================
+	      The following targets do the extra work necessary to compile, package and
+	      deploy the EJB examples.
+	    ============================================================================
+	-->
+
+	<!-- Packages the calculator EAR file. -->
+	<target name="calculator-ejb-jar">
+		<antcall target="g-jar">
+			<param name="include.classes" value="**/ejb/*.class" />
+		</antcall>
+	</target>
+
+	<!-- Packages the calculator WAR file. -->
+	<target name="calculator-war">
+		<path id="classpath.altered">
+			<fileset dir="${home.jboss}/client" includes="**/*.jar" />
+			<fileset dir="${home.jboss}/server/${jboss.server}/lib"
+			         includes="**/*.jar" />
+			<fileset dir="${home.jboss}/server/${jboss.server}/deploy/jbossweb.sar/jsf-libs"
+			         includes="**/*.jar" />
+		</path>
+		<antcall target="g-war">
+			<reference refid="classpath.altered" torefid="classpath" />
+			<param name="include.classes" value="**/CalculatorViewBean.class" />
+		</antcall>
+	</target>
+
+
+
+	<!-- 
+	===================================================================== 
+	Targets that set up server and client for SSL. 
+	===================================================================== 
+	-->
+	<target name="add-virtual-host">
+		<loadfile property="src.serverxml"
+		          srcfile="${dir.alt}/${alt.target}/server.xml">
+			<filterchain>
+				<headfilter lines="-1" skip="17" />
+			</filterchain>
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</loadfile>
+		<copy file="${dir.jbossweb}/server.xml" todir="${dir.config}">
+			<filterchain>
+				<tokenfilter>
+					<replaceregex pattern="(\x3cConnector)"
+						          flags="g"
+					              replace="&lt;Connector useIPVHosts=&quot;true&quot;" />
+				</tokenfilter>
+				<tokenfilter>
+					<replaceregex pattern="(\x3c/Engine\x3e)"
+					              replace="${src.serverxml}" />
+				</tokenfilter>
+			</filterchain>
+		</copy>
+		<copy todir="${dir.jbossweb}"
+		      file="${dir.config}/server.xml"
+		      overwrite="true" />
+	</target>
+
+
+	<!-- 
+       ============================================================================
+       These targets clean up the mess we made.
+       ============================================================================
+    -->
+
+	<target description="Removes all generated files."
+	        name="clean"
+	        depends="g-clean" />
+	<target description="Removes all generated files and the JBoss AS configuration."
+	        name="clean-all"
+	        depends="g-clean-all" />
+
+</project>

@@ -1,0 +1,266 @@
+<!--
+#  Copyright 2008, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<title>JBIA - JBoss Portal</title>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+</head>
+
+<body>
+
+<h1>Ch 10 &amp; 11 - JBoss Portal</h1>
+<p>Every target requires JBoss Portal, thus the <code>home.portal</code>
+property must be set in the <code>ch00/build.properties</code>. In addition, you
+must edit the <code>ch10/build.properties</code> file, providing the location of
+the JBoss Application Server 4.2.3 binary ZIP file. Note that there are two
+binary downloads for JBoss AS 4.2.3, one for JDK 5 the other for JDK 6. Make
+sure that you get the one that matched your JDK.</p>
+<p>All build targets create an application server configuration named <code>
+portal</code>. After the build, to run the application server, open another command
+window, <code>cd</code> to the applications server's <code>bin</code> directory,
+and enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c portal</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c portal</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Once the application server is running, open a browser and enter the URL
+<a target="_blank" href="http://localhost:8080/portal">http://localhost:8080/portal</a>
+to see the home page for the portal. The &quot;After the Build&quot; text for
+each target describes when you will see, or where go beyond the home page.</p>
+<p>Each target creates and initializes a database named portaldb.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">01</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>10.2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal with the basic image portlet.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>When the portal home page displays, note that the image portlet is not
+displayed.</p>
+<p>If you want, you can login as admin/admin, and in the Management Portlet,
+under the Portlet Definitions tab, note the appearance of the
+local.image.ImagePortlet entry.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">02</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>10.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal with the image portet, with an instance defined.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>When the portal home page displays, note that the image portlet is not
+displayed.</p>
+<p>If you want, you can login as admin/admin, and in the Management Portlet,
+under the Portlet Instances tab, note the appearance of the ImagePortletInstance
+entry.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">03</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>10.4</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal with the image portlet, with an empty renderer.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>When the portal home page displays, note that the image portlet
+containing the RedHat logo is displayed at the bottom of the page.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">04</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>11.1</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal with the image portlet, with an empty renderer.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>When the portal home page displays, note that the RedHat logo is
+displayed at the bottom of the left-hand column, and there is no border around
+it.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">05</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>11.2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal with the image portlet, defining multiple
+    instances and windows.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>When the portal home page displays, note that the RedHat and JBoss logos
+are displayed at the bottom of the left-hand column with no border around them.
+In addition, the astronomy picture of the day is displayed in the right-hand
+column.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">06</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>11.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates the zip file containing CMS content.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>This target does not create an application server configuration or
+database. If you have not yet done so, run one of the earlier targets first.</p>
+<p>Once you are at the portal home page, follow the instructions in section
+13.3.2 to load and display the CMS content.</p>
+<p>The ZIP file is created at <code>target/dist/cms.zip</code>.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">07</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>11.4.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal that illustrates access control.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Login as admin/admin, and in the Management Portlet you will see the new
+PortalA portal.</p>
+<p>Each role has a corresponding user. For example, user <code>user1</code>
+belongs to role <code>Role1</code>, and user <code>user1</code> has password <code>user1</code>.
+Log in as the users <code>user1</code> through <code>user5</code> and attempt to
+access PortalA and its pages. Your access rights will be the same as described
+in table 11.3, in section 11.4.3, of the book.</p>
+<p>Enter the URL <a target="_blank"
+  href="http://localhost:8080/portal/auth/portal/PortalA/">http://localhost:8080/portal/auth/portal/PortalA/</a>
+to access portal PortalA.</p>
+<p>To access a specific page, such as Page2, enter a URL that includes the
+page, such as <a target="_blank"
+  href="http://localhost:8080/portal/auth/portal/PortalA/Page2">http://localhost:8080/portal/auth/portal/PortalA/Page2</a>.
+</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">08</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>11.4.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates a portal with subpages that illustrates access control.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>See the &quot;After the build&quot; steps for target 07. Log in as <code>user1</code>
+and view PortalA, hover over the Page1 tab to see the drop-down menu showing the
+Page1a link. Click it to go there. To access Page2a, log in as <code>user4</code>,
+enter the URL <a target="_blank"
+  href="http://localhost:8080/portal/auth/portal/PortalA/Page2">http://localhost:8080/portal/auth/portal/PortalA/Page2</a>
+to access Page2, then hover over the Page2 tab to see the drop-down menu showing
+the Page2a link.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">09</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>11.5</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates and deploys a custom portal.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>You should see the custom portal home page as shown in figure 13.16 (at
+the end of the section).</p>
+<hr />
+<p align="center">&copy; 2008, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>

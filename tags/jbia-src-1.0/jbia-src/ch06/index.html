@@ -1,0 +1,297 @@
+<!--
+#  Copyright 2007, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+<title>JBIA - Securing Web Applications</title>
+</head>
+
+<body>
+
+<h1>Ch 6 - Securing Web Applications</h1>
+<p>All build targets create an application server configuration
+named <code>websecurity</code>. After the build, to run the application
+server, open another command window, <code>cd</code> to the applications
+server's <code>bin</code> directory, and enter:</p>
+<table class="command">
+	<tr>
+		<td class="commandText">./run.sh -c websecurity</td>
+		<td>(Linux)</td>
+	</tr>
+	<tr>
+		<td class="commandText">run -c websecurity</td>
+		<td>(Windows)</td>
+	</tr>
+</table>
+<p>None of the targets creates a database.</p>
+<p>All of the build targets will create a simple Hello World
+application, but each target will enable security differently.</p>
+
+<hr />
+
+<!-- *****************************************
+			TARGET 01
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">01</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.2.2</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Enables BASIC authentication security</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="http://localhost:8080/jbiawebsecurity/sayhello">http://localhost:8080/jbiawebsecurity/sayhello</a>
+and login as:<br />
+<br />
+<code>username: somebody<br />
+password: special</code></p>
+
+<hr />
+
+<!-- *****************************************
+			TARGET 02
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">02</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.2.3</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Enables FORM authentication security</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="http://localhost:8080/jbiawebsecurity/sayhello">http://localhost:8080/jbiawebsecurity/sayhello</a>
+and login as:<br />
+<br />
+<code>username: somebody<br />
+password: special</code></p>
+
+<hr />
+
+<!-- *****************************************
+			TARGET 03
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">03</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.2.3</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Enables DIGEST authentication security</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="http://localhost:8080/jbiawebsecurity/sayhello">http://localhost:8080/jbiawebsecurity/sayhello</a>
+and login as:<br />
+<br />
+<code>username: somebody<br />
+password: special</code></p>
+<p>The digest password was created using the <code>org.jboss.security.auth.spi.RFC2617Digest</code>
+class as described in the book:<br />
+<br />
+
+<code>$ java -classpath jbosssx-server.jar
+org.jboss.security.auth.spi.RFC2617Digest somebody Default special<br />
+RFC2617 A1 hash: f29c3fa0d4c9570e56027e385360fd66</code></p>
+
+<hr />
+
+<!-- *****************************************
+			TARGET 04
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">04</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.4.1</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Enables HTTPS with basic server authentication by providing
+		the server with a certificate</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="https://localhost:8443/https/sayhello">https://localhost:8443/https/sayhello</a>.
+Your browser should propmt you to accept an unsigned certificate. Accept
+this then you should see the Hello World message.</p>
+<p>Note, there is no transport guarantee enabled, so the application
+can also be accessed through <a target="_new"
+	href="http://localhost:8080/https/sayhello">http://localhost:8080/https/sayhello</a></p>
+<hr />
+
+<!-- *****************************************
+			TARGET 05
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">05</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.4.2</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Does the same thing as Target 04, but also enabled a
+		transport guarantee for the application to ensure that it can only be
+		accessed over HTTPS.</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="http://localhost:8080/transportguarantee/sayhello">http://localhost:8080/https/sayhello</a>.
+You should be redirected to <code>https://localhost:8443/transportguarantee/sayhello</code>.</p>
+<hr />
+
+<!-- *****************************************
+			TARGET 06
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">06</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.4.3</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Enables mutual authentication</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="https://localhost:8443/mutualauthentication/sayhello">https://localhost:8443/mutualauthentication/sayhello</a>.
+You should be prompted to accept the server's unsigned certificate. Once
+you accept this, the page loading will fail because the server will not
+recognize your browser without a certificate.</p>
+<p>In order to load the page, you will have to import the PKCS12
+certificate into your browser</p>
+<p>If you are using Firefox 2, go to
+Tools->Options->Advanced->Encryption->View Certificates->Import.</p>
+<p>If you are using IE 7, go to Tools->Internet Options->
+Content->Certificates->Import...</p>
+<p>Other browsers and versions should have similar menus that you
+use to import a certificate. The file that you'll want to import is in <code>jbia-src/ch06/target/keystore/client.p12</code>.
+It will prompt you for a password for the certificate. Use the password
+<code>clientpass</code>. After you import this file, try to load the
+page again, and it should work.</p>
+<hr />
+
+<!-- *****************************************
+			TARGET 07
+     *****************************************
+ -->
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">07</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>6.5</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Enables client certificate authentication (CLIENT-CERT)</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a target="_new"
+	href="https://localhost:8443/jbiawebsecurity/insecure/sayhello">https://localhost:8443/jbiawebsecurity/insecure/sayhello</a>.
+You should be prompted to accept the server's unsigned certificate. Once
+you accept this, the page will load. This is an insecure url mapping to
+the servlet, which demonstrates that <code>clientAuth</code> is set to <code>false</code>
+in the server.xml file.</p>
+<p>Now try to navigate to <a target="_new"
+	href="https://localhost:8443/jbiawebsecurity/secure/incorrectrole">https://localhost:8443/jbiawebsecurity/secure/incorrectrole</a>.
+Loading will fail because the <code>BaseCertLoginModule</code> will
+force mutual authentication.</p>
+<p>In order to load the page, you will have to import the PKCS12
+certificate into your browser</p>
+<p>If you are using Firefox 2, go to
+Tools->Options->Advanced->Encryption->View Certificates->Import.</p>
+<p>If you are using IE 7, go to Tools->Internet Options->
+Content->Certificates->Import...</p>
+<p>Other browsers and versions should have similar menus that you
+use to import a certificate. The file that you'll want to import is in <code>jbia-src/ch06/target/keystore/client.p12</code>.
+It will prompt you for a password for the certificate. Use the password
+<code>clientpass</code>. After you import this file, try to load <a
+	target="_new"
+	href="https://localhost:8443/jbiawebsecurity/secure/incorrectrole">https://localhost:8443/jbiawebsecurity/secure/incorrectrole</a>
+again. It should still fail, but this time it will fail because your
+certificate is only associated with the <code>admin</code> role, and
+this URL pattern requires the <code>user</code> role.</p>
+<p>Last but not least, navigate to <a target="_new"
+	href="https://localhost:8443/jbiawebsecurity/secure/correctrole">https://localhost:8443/jbiawebsecurity/secure/correctrole</a>.
+This URL has the <code>admin</code> role associated with it and you
+should be able to see the Hello World message.</p>
+<hr />
+
+<p align="center">© 2007, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>
