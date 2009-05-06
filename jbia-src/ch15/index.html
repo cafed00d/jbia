@@ -177,8 +177,9 @@ enter:</p>
 file where XXX is either <code>mysql</code> or <code>postgresql</code>.</p>
 <p>After starting the application server, you could check the productiondb
 database using the administration tool for your database. The productiondb
-database should contain tables for messaging (jbm_*), quartz (qrtz_*), and a few
-other services.</p>
+database should contain tables for messaging (jbm_*), Quartz (qrtz_*), and a few
+other services. Note that the Quartz tables are not present if you are using 
+JBoss AS 5.0.1.</p>
 <hr />
 <table class="target">
   <tr>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
  *******************************************************************************
- *  Copyright 2008, Javid Jamae and Peter Johnson
+ *  Copyright 2009, Javid Jamae and Peter Johnson
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License. You may obtain a copy
@@ -184,7 +184,7 @@
             <attribute name="Chapter" value="${book.chapter}" />
             <attribute name="URL" value="http://www.manning.com/jamae" />
             <attribute name="Authors" value="Javid Jamae, Peter Johnson" />
-            <attribute name="Version" value="1.0" />
+            <attribute name="Version" value="1.1" />
             <attribute name="Built-on" value="${time.build}" />
           </section>
         </manifest>

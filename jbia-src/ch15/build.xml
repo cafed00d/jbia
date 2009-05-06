@@ -324,7 +324,7 @@
   <target name="db-post" depends="db-datatypes, clean-hypersonic" />
 
   <!-- Remove all files related to Hypersonic -->
-  <target name="clean-hypersonic" if="clean.hypersonic">
+  <target name="clean-hypersonic" if="clean.hypersonic" depends="clean-timer">
     <delete file="${dir.deploy}/hsqldb-ds.xml" />
     <delete>
       <fileset dir="${dir.lib}" includes="**/hsqldb*.jar" />
@@ -353,10 +353,17 @@
           file="${dir.config}/${mysql.or.postgresql}-persistence-service.xml"
           overwrite="true"
     />
-    <!-- Change the EJB3 timer BINARY type to the correct type for the database -->
+  </target>
+
+  <!--
+    Change the EJB3 timer BINARY type to the correct type for the database.
+    Note that the file does not exist in 5.0.1, hence failonerror is 'false'.
+  -->
+  <target name="clean-timer" if="clean.hypersonic" >
     <copy file="${dir.deploy}/ejb3-timer-service.xml"
           todir="${dir.config}"
           verbose="true"
+          failonerror="false"
     >
       <filterchain>
         <tokenfilter>
@@ -405,6 +412,7 @@
     <copy todir="${dir.deploy}"
           file="${dir.config}/ejb3-timer-service.xml"
           overwrite="true"
+          failonerror="false"
     />
   </target>
 

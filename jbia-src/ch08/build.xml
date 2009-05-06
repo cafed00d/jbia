@@ -137,6 +137,7 @@
     <property name="alt.target" value="05" />
     <property name="need.database" value="true" />
     <property name="db.dsxml" value="./src/alt/jboss/encrypted-ds.xml" />
+    <!-- The encrypted password is 'jbossinactionpwd' -->
     <property name="db.password.encrypted"
               value="4328fae45aec5dd57f96b0e7b2b2e76fdf8592078de921bc"
     />
@@ -146,6 +147,7 @@
     <property name="jar.todeploy" location="${jar.mdb.path}" />
     <property name="need.database" value="true" />
     <property name="db.dsxml" value="./src/alt/jboss/encrypted-ds.xml" />
+    <!-- The encrypted password is 'jbossinactionpwd' -->
     <property name="db.password.encrypted"
               value="4328fae45aec5dd57f96b0e7b2b2e76fdf8592078de921bc"
     />
