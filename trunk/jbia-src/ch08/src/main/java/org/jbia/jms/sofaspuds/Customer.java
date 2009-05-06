@@ -1,5 +1,5 @@
 /*
- *  Copyright 2008, Javid Jamae and Peter Johnson
+ *  Copyright 2009, Javid Jamae and Peter Johnson
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License. You may obtain a copy
@@ -25,6 +25,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
+import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -34,6 +35,12 @@ import javax.naming.InitialContext;
  */
 public class Customer {
 
+  /**
+   * Indicates if the consumer topic will be durable or not. The topic is
+   * durable for tagets 05 and 06 only.
+   */
+  private final boolean DURABLE_TOPIC = ${topic.durable};
+  
   /**
    * Used to read input from the command line.
    */
@@ -91,7 +98,11 @@ public class Customer {
        * Create the consumer and producer used to send and receive messages:
        */
       producer = session.createProducer(request);
-      consumer = session.createConsumer(notify);
+      if (DURABLE_TOPIC) {
+        consumer = session.createDurableSubscriber((Topic)notify, customer);
+      } else {
+        consumer = session.createConsumer(notify);
+      }
 
       /*
        * No messages will be received, or can be sent, until the connection is

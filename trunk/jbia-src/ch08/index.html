@@ -1,5 +1,5 @@
 <!--
-#  Copyright 2008, Javid Jamae and Peter Johnson
+#  Copyright 2009, Javid Jamae and Peter Johnson
 # 
 #  Licensed under the Apache License, Version 2.0 (the "License"); you may not
 #  use this file except in compliance with the License. You may obtain a copy
@@ -71,10 +71,10 @@ app, enter 'x' when prompted to reserve a video. We recommend exiting the client
  pp before exiting the store app, and exiting both apps before stopping the
  app server.</p>
 <p>When you run the clients, you get two warning messages about logging. You
-can safely ignore those. The clients does not contain any logging code, but some
+can safely ignore those. The clients do not contain any logging code, but some
 of the libraries included in the class path use logging and it is because of
 those libraries that the warning message appears.</p>
-<p>Some targets create and initialize a database named messagingdb.</p>
+<p>Some targets create and initialize a database named <code>messagingdb</code>.</p>
 <hr />
 <table class="target">
   <tr>
@@ -183,7 +183,10 @@ the POJO's response.</p>
 </table>
 <p>Be aware that only customers named 'Natalie' and 'Xavier' have
 authorization to listen for video notifications, all other customers will
-receive a security error. Note that the names are case-sensitive!</p>
+receive a security error. Note that the names are case-sensitive! In addition,
+the topic is now durable - you can stop the customer app and enter more video
+notifications and when the customer signs back in she is notified of the videos
+that were published while she was gone.</p>
 <hr />
 <table class="target">
   <tr>
