@@ -1,4 +1,4 @@
-= Version Information =
+*Version Information
 
 The build places a version number, and other identifying information, into the META-INF/MANIFEST.MF file of the archive(s) created. The following table identifies the JBoss AS version associated with each JBiA source version.
 
