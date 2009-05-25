@@ -54,8 +54,6 @@
     -->
 	<target description="(12.?) Creates a two node cluster and deploys an EJB load balancing example to it" name="01" depends="init-01, g-init, g-reset-jboss, 01-package, g-deploy-jar" />
 
-	<target description="(12.?) " name="02" depends="init-02, g-init, g-reset-jboss, jboss-binding" />
-
 	<!-- 
 	=========================================================================
     This set of variations of the major targets only compile and package the
@@ -73,15 +71,9 @@
 	    ============================================================================
 	  -->
 	<target name="init-01">
-		<property name="alt.target" value="01" />
 		<property name="need.second.server" value="true" />
 		<property name="jboss.server.config" value="all" />
 		<property name="dir.main" location="src/ejbloadbalancing" />
-	</target>
-	<target name="init-02">
-		<property name="alt.target" value="02" />
-		<property name="need.second.server" value="true" />
-		<property name="jboss.server.config" value="all" />
 	</target>
 
 	<!-- 
@@ -113,23 +105,6 @@
 	<target name="alt-01">
 	</target>
 
-	<!-- Copy the create a unique node-id in the messaging-service.xml to avoid conflict -->
-	<target name="update-messaging-node-id">
-		<copy todir="${dir.config}">
-			<fileset dir="${dir.alt.jboss}">
-				<exclude name="**/jboss-service-suffix.xml" />
-			</fileset>
-			<filterchain>
-				<tokenfilter>
-					<replaceregex pattern="jbossMessagingNodeId" replace="${server.node}" />
-				</tokenfilter>
-			</filterchain>
-		</copy>
-		<copy todir="${dir.server}" overwrite="true">
-			<fileset dir="${dir.config}" />
-		</copy>
-	</target>
-
 
 	<!--
 	============================================================================
@@ -148,53 +123,9 @@
 		<antcall target="g-jboss-server">
 			<param name="dir.server" value="${dir.server.base}/${jboss.server.2}" />
 		</antcall>
-		<antcall target="update-messaging-node-id">
-			<param name="server.node" value="2" />
-			<param name="dir.server" value="${dir.server.base}/${jboss.server.2}" />
-		</antcall>
 		<antcall target="g-deploy-jar">
 			<param name="dir.deploy" value="${dir.server.base}/${jboss.server.2}/deploy" />
 		</antcall>
-	</target>
-
-	<!-- Configure the binding manager service -->
-	<target name="jboss-binding" depends="g-clean">
-		<copy tofile="${dir.server.base}/portBindings.xml" file="${home.jboss}/docs/examples/binding-manager/sample-bindings.xml" />
-		<antcall target="append-service-binding">
-			<param name="param.jboss.server" value="${jboss.server}" />
-			<param name="jbia.port.binding" value="ports-default" />
-		</antcall>
-		<antcall target="append-service-binding">
-			<param name="param.jboss.server" value="${jboss.server.2}" />
-			<param name="jbia.port.binding" value="ports-01" />
-		</antcall>
-	</target>
-
-
-	<!--
-	    Appends the Service Binding Manager MBean to the services configuration file.
-	-->
-	<target name="append-service-binding">
-		<loadfile property="src.jboss.service" srcfile="${dir.alt.jboss}/jboss-service-suffix.xml">
-			<filterchain>
-				<!-- Skip copyright and opening tag -->
-				<headfilter lines="-1" skip="18" />
-			</filterchain>
-		</loadfile>
-		<!-- We will do this twice, so put each file in a unique location -->
-		<copy file="${dir.server.base}/${param.jboss.server}/conf/jboss-service.xml" todir="${dir.output}/alt/${param.jboss.server}/jboss/conf">
-			<filterchain>
-				<tokenfilter>
-					<replaceregex pattern="(\x3c/server\x3e)" replace="${src.jboss.service}" />
-				</tokenfilter>
-			</filterchain>
-		</copy>
-		<!-- Set the ServerName property during this copy operation -->
-		<copy todir="${dir.server.base}/${param.jboss.server}/conf" file="${dir.output}/alt/${param.jboss.server}/jboss/conf/jboss-service.xml" overwrite="true" verbose="true">
-			<filterchain>
-				<expandproperties />
-			</filterchain>
-		</copy>
 	</target>
 
 
