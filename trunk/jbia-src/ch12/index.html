@@ -25,27 +25,33 @@
 
 <h1>Ch 12 &amp; 13 - JBoss Clustering</h1>
 <p>All build targets create two application server configurations named <code>
-node1</code> and <code>node2</code>. After the build, to run the application servers, open two command
-windows, <code>cd</code> to the applications server's <code>bin</code> directory in each,
-and enter the following in one window:</p>
+node1</code> and <code>node2</code>. Due to an issue with Ant, empty directories do not get extracted from the JBoss
+distribution properly. In order for the clustering examples to work, you'll have to create an empty directory called 
+<code>deploy-hasingleton</code> under the <code>server</code> directory for both <code>node1</code> and <code>node2</code>.
+
+<p>After the build, follow the directions in section 12.2.1 of the book 
+to configure your machine to start two different IP addresses to run your nodes on. On Linux you'll use localhost 
+and your machine name, on Windows, we show you how to setup two IPs (we use 192.168.1.140 and 192.168.1.141). To run 
+the application  servers, open two command windows, <code>cd</code> to the applications server's <code>bin</code> 
+directory in each, and enter the following in one window:</p>
 <table class="command">
   <tr>
-    <td class="commandText">./run.sh -c node1</td>
+    <td class="commandText">./run.sh –c node1 –b localhost –Djboss.messaging.ServerPeerID=1</td>
     <td>(Linux)</td>
   </tr>
   <tr>
-    <td class="commandText">run -c node1</td>
+    <td class="commandText">run –c node1 –b 192.168.1.140 –Djboss.messaging.ServerPeerID=1</td>
     <td>(Windows)</td>
   </tr>
 </table>
 <p>Then enter the following in the other:</p>
 <table class="command">
   <tr>
-    <td class="commandText">./run.sh -c node2</td>
+    <td class="commandText">./run.sh –c node2 –b [machine name] –Djboss.messaging.ServerPeerID=2</td>
     <td>(Linux)</td>
   </tr>
   <tr>
-    <td class="commandText">run -c node2</td>
+    <td class="commandText">run –c node2 –b 192.168.1.141 –Djboss.messaging.ServerPeerID=2</td>
     <td>(Windows)</td>
   </tr>
 </table>
