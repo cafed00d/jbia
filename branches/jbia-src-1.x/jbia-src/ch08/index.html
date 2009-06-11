@@ -1,0 +1,242 @@
+<!--
+#  Copyright 2009, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+<title>JBIA - JBoss Messaging</title>
+</head>
+
+<body>
+
+<h1>Ch 8 - JBoss Messaging</h1>
+<p>All build targets create an application server configuration named <code>
+messaging</code>. After the build, to run the application server, open another command
+window, <code>cd</code> to the applications server's <code>bin</code> directory,
+and enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c messaging</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c messaging</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Then run both the store and customer clients using the scripts generated
+in the <code>target/dist</code> directory. For example, open a second
+command window, <code>cd</code> to the <code>ch08</code> directory, and enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">target/dist/customer.sh Natalie</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">target\dist\customer.bat Natalie</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>And then from the same command window where you ran the build, run:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">target/dist/store.sh</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">target\dist\store.bat</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Respond to the prompts you see in the store window, note the results in
+the customer window, and reply to those prompts. Note the results in the store
+window. The &quot;After the build&quot; text for each target describes what you
+should be looking for.</p>
+<p>To exit the store app, enter an empty name and genre. To exit the customer
+app, enter 'x' when prompted to reserve a video. We recommend exiting the client
+ pp before exiting the store app, and exiting both apps before stopping the
+ app server.</p>
+<p>When you run the clients, you get two warning messages about logging. You
+can safely ignore those. The clients do not contain any logging code, but some
+of the libraries included in the class path use logging and it is because of
+those libraries that the warning message appears.</p>
+<p>Some targets create and initialize a database named <code>messagingdb</code>.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">01</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the messaging clients, and initializes the
+    messaging server.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Section 8.2.2 describes an example interaction between the store and
+customer clients.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">02</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.3.1-2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the messaging clients and the MDB (using
+    annotations), initializes the messaging server, and deploys the MDB.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Note the response of the MDB in the application server window. Be aware
+that the MDB response will only show up if you use the name 'Natalie' for the
+customer. Note that the name is case-sensitive!</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">03</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.3.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the messaging clients and the MDB (using
+    descriptors), initializes the messaging&nbsp; server, and deploys the MDB.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Note the response of the MDB in the application server window. Be aware
+that the MDB response will only show up if you use the name 'Natalie' for the
+customer. Note that the name is case-sensitive.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">04</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.4</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td width="707">Builds and packages the messaging clients and the
+    messaging POJO, initializes the messaging server, and deploys the POJO.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Note the response of the message-driven POJO in the application server
+window. Unlike targets 02 and 03, you can use any name for the customer and get
+the POJO's response.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">05</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.5.1-5</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td width="707">Sets up a database, authorization, and custom
+    destinations for the messaging clients.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Be aware that only customers named 'Natalie' and 'Xavier' have
+authorization to listen for video notifications, all other customers will
+receive a security error. Note that the names are case-sensitive! In addition,
+the topic is now durable - you can stop the customer app and enter more video
+notifications and when the customer signs back in she is notified of the videos
+that were published while she was gone.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">06</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.5.6</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td width="707">Sets up a database, authorization, and custom
+    destinations for the messaging clients and MDB.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Note the response of the MDB in the application server window. Be aware
+that the MDB response will only show up if you use the name 'Natalie' for the
+customer, and that only the customers named 'Natalie' and 'Xavier' have
+authorization to listen for video notifications, all other customers will
+receive a security error. (In other words, this target behaves as a combination
+of targets 02 and 05.) Note that the names are case-sensitive.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">07</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>8.5.7</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and packages the messaging clients which use SSL encryption,
+    and initializes the messaging server.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Unless you have a way of sniffing the network packets, you will not be
+able to tell, but the messages are encrypted.</p>
+<p>The file <code>ch08/src/alt/keystore/keystore.txt</code> contains a log
+of the inputs used to create the certificates.</p>
+<hr />
+<p align="center">&copy; 2008, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>

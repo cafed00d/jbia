@@ -1,0 +1,757 @@
+<?xml version="1.0"?>
+<!--
+ *******************************************************************************
+ *  Copyright 2009, Javid Jamae and Peter Johnson
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *******************************************************************************
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                            Included Build Script
+
+  This Ant build script contains various properties, targets and macros used
+  by many of the other build scripts. It is intended that the other scripts
+  include this script, do not run this script by itself.
+
+============================================================================ -->
+<project name="jbia" basedir="." default="help">
+
+  <!-- Tell the user to run one of the chapter-specific build scripts. -->
+  <target name="help">
+    <echo>Do not run this script directly. Instead, cd to one of the chapter</echo>
+    <echo>directories, such as 'cd ../ch08', and run the Ant script there.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets initialize the properties used during the build.
+    ============================================================================
+  -->
+  <target name="g-init"
+          depends="init-log, init-pre, g-init-src, g-init-out, g-init-jboss, g-init-classpath, g-init-db, g-db-props, init-post, g-init-general, g-validate"
+  />
+
+  <!-- Generate a verbose log of the build -->
+  <target name="init-log">
+    <record name="build.log" action="start" loglevel="verbose" />
+  </target>
+
+  <!--
+    Override this target if you need to set any properties before the global
+    properties are set. Suggestions:
+    - jboss.server
+    - book.chapter
+  -->
+  <target name="init-pre" />
+
+  <!--
+    Override this target if you need to set any properties after the global
+    properties are set, but before the properties are dumped to a log file.
+    Suggestions:
+    - any extra source, output or JBoss locations
+  -->
+  <target name="init-post" />
+
+  <!-- Set properties related to the source files. -->
+  <target name="g-init-src">
+    <property name="dir.src" location="src" />
+    <property name="dir.main" location="${dir.src}/main" />
+    <property name="dir.java" location="${dir.main}/java" />
+    <property name="dir.resources" location="${dir.main}/resources" />
+    <property name="dir.script" location="${dir.main}/script" />
+    <property name="dir.config.src" location="${dir.main}/jboss" />
+    <property name="dir.alt" location="${dir.src}/alt" />
+    <condition property="need.resources">
+      <available file="${dir.resources}" />
+    </condition>
+    <condition property="need.config">
+      <available file="${dir.config.src}" />
+    </condition>
+    <condition property="need.scripts">
+      <available file="${dir.script}" />
+    </condition>
+  </target>
+
+  <!-- Set properties related to the generated files. -->
+  <target name="g-init-out">
+    <property name="app.name" value="${ant.project.name}" />
+    <property name="dir.output" location="target" />
+    <property name="dir.gen" location="${dir.output}/gen" />
+    <property name="dir.config" location="${dir.output}/jboss" />
+    <property name="dir.classes" location="${dir.output}/classes" />
+    <property name="dir.dist" location="${dir.output}/dist" />
+    <property name="jar.name" value="${app.name}.jar" />
+    <property name="jar.path" location="${dir.dist}/${jar.name}" />
+    <property name="war.name" value="${app.name}.war" />
+    <property name="war.path" location="${dir.dist}/${war.name}" />
+    <property name="ear.name" value="${app.name}.ear" />
+    <property name="ear.path" location="${dir.dist}/${ear.name}" />
+  </target>
+
+  <!-- Set properties related to the JBoss AS. -->
+  <target name="g-init-jboss">
+    <property name="jboss.server" value="${ant.project.name}" />
+    <basename property="jboss.version" file="${jboss.zip}" suffix=".zip" />
+    <property name="home.jboss" location="${jboss.base}/${jboss.version}" />
+    <property name="dir.server.base" location="${home.jboss}/server" />
+    <property name="jboss.server.config" value="default" />
+    <property name="dir.server" location="${dir.server.base}/${jboss.server}" />
+    <property name="dir.conf" location="${dir.server}/conf" />
+    <property name="dir.deploy" location="${dir.server}/deploy" />
+    <property name="dir.lib" location="${dir.server}/lib" />
+    <property name="dir.client" location="${home.jboss}/client" />
+    <property name="dir.examples" value="${home.jboss}/docs/examples" />
+  </target>
+
+  <!--
+    This classpath includes all of the client JAR files, which are required for
+    compiling clients, and the JAR files in the server/xxx/lib directory, which
+    are required for compiling servlets.
+  -->
+  <target name="g-init-classpath" unless="ignore.classpath">
+    <path id="classpath">
+      <fileset dir="${home.jboss}/client" includes="**/*.jar" />
+      <fileset dir="${home.jboss}/common/lib" includes="**/*.jar" />
+      <fileset dir="${home.jboss}/server/${jboss.server}/lib"
+               includes="**/*.jar"
+      />
+    </path>
+  </target>
+
+  <!-- Set properties related to the database. -->
+  <target name="g-init-db" depends="g-init-jboss">
+    <property name="dir.db" value="${dir.ch00}/src/main/db" />
+    <property name="db.dsxml" value="${dir.db}/jbia-ds.xml" />
+    <property name="database.type" value="hsqldb" />
+
+    <!-- Set database-specific properties for the database identified. -->
+    <condition property="database.mysql" value="mysql">
+      <equals arg1="${database.type}" arg2="mysql" />
+    </condition>
+    <condition property="database.postgresql" value="postgresql">
+      <equals arg1="${database.type}" arg2="postgresql" />
+    </condition>
+    <condition property="database.hsqldb" value="hsqldb">
+      <equals arg1="${database.type}" arg2="hsqldb" />
+    </condition>
+
+    <!--
+      Database-related properties whose values are the same regardless of which
+      database is being used:
+    -->
+    <property name="db.database" value="${jboss.server}db" />
+    <property name="db.datasource" value="jdbc/${jboss.server}DS" />
+  </target>
+
+
+  <!-- Perform various initializations, call this last -->
+  <target name="g-init-general">
+
+    <!-- Get the current date and time -->
+    <tstamp>
+      <format property="time.build" pattern="yyyy-MM-dd HH:mm" />
+    </tstamp>
+
+    <!-- Get the operating system -->
+    <condition property="os.linux">
+      <os family="unix" />
+    </condition>
+    <condition property="os.windows">
+      <os family="windows" />
+    </condition>
+
+    <!-- Now that the properties are set, dump them. -->
+    <echoproperties destfile="properties.log" />
+
+    <!-- Manifest to use for all archive files -->
+    <presetdef name="jbia.jar">
+      <jar>
+        <manifest>
+          <section name="JBoss in Action">
+            <attribute name="Chapter" value="${book.chapter}" />
+            <attribute name="URL" value="http://www.manning.com/jamae" />
+            <attribute name="Authors" value="Javid Jamae, Peter Johnson" />
+            <attribute name="Version" value="1.1" />
+            <attribute name="Built-on" value="${time.build}" />
+          </section>
+        </manifest>
+      </jar>
+    </presetdef>
+  </target>
+
+  <!--
+    ============================================================================
+      The following targets verify that the environment settings are correct.
+    ============================================================================
+  -->
+  <target name="g-validate"
+          depends="g-validate-jboss, g-validate-portal, g-validate-db, g-validate-native"
+  />
+
+  <!-- Check that we can find JBoss AS. -->
+  <target name="g-validate-jboss">
+    <condition property="exists.jboss">
+      <available file="${jboss.zip}" />
+    </condition>
+    <fail unless="exists.jboss"
+          message="Check the setting of jboss.zip in build.properties; could not find: ${jboss.zip}"
+    />
+  </target>
+
+  <!-- Check that we can find JBoss Portal by looking for the portlet JAR. -->
+  <target name="g-validate-portal" if="need.portal">
+    <!-- This is the name of the portlet JAR under 2.7.x -->
+    <condition property="exists.portal">
+      <available file="${home.portal}/jboss-portal.sar/lib/portlet-api.jar" />
+    </condition>
+    <!-- This is the name of the portlet JAR under 2.6.x -->
+    <condition property="exists.portal">
+      <available file="${home.portal}/jboss-portal.sar/lib/portal-portlet-jsr168api-lib.jar"
+      />
+    </condition>
+    <!-- This is the name of the portlet JAR under 2.4.x -->
+    <condition property="exists.portal">
+      <available file="${home.portal}/jboss-portal.sar/lib/portlet-api-lib.jar"
+      />
+    </condition>
+    <fail unless="exists.portal"
+          message="Check the setting of home.portal in build.properties; could not find: ${home.portal}/jboss-portal.sar/lib/portlet-api-lib.jar, portlet-api.jar, or portal-portlet-jsr168api-lib.jar"
+    />
+  </target>
+
+  <!--
+    Check that we can find JBoss Native. Because there are so many variations,
+    each for a different operating system and processor, and they each have
+    varying files, we will look only for the bin/META-INF/bin directory.
+  -->
+  <target name="g-validate-native" if="need.native">
+    <condition property="exists.native">
+      <available file="${home.native}/bin/META-INF/bin" type="dir" />
+    </condition>
+    <fail unless="exists.native"
+          message="Check the setting of home.native in build.properties; could not find directory: ${home.native}/bin/META-INF/bin"
+    />
+  </target>
+
+  <!--
+    Check that a database was specified and that we have access to its JAR file.
+  -->
+  <target name="g-validate-db" if="need.database">
+    <condition property="given.database">
+      <or>
+        <isset property="database.mysql" />
+        <isset property="database.postgresql" />
+      </or>
+    </condition>
+    <fail unless="given.database"
+          message="This example requires a MySQL or PostgreSQL database. Check the database settings in the build.properties file."
+    />
+    <condition property="exists.database">
+      <available file="${database.jar}" />
+    </condition>
+    <fail unless="exists.database"
+          message="Unable to find the JAR file for the ${mysql.or.postgresql} database: ${database.jar}"
+    />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets are used to compile and package the application.
+    ============================================================================
+  -->
+
+  <!--
+    Most of the examples use the same basic source code, at times with only a
+    line or two being different. Rather than maintaining multiple, almost
+    identical, copies of a given file, we run the source through a pre-process
+    step which applies the necessary modification to a base file to generate the
+    source file to compile. It is times like this that we wish Java had
+    pre-processor macro support...
+  -->
+  <target name="g-preprocess" if="need.preprocess">
+    <property name="java.source" location="${dir.gen}" />
+    <property file="${dir.alt}/${alt.target}/preprocessor.properties" />
+    <copy todir="${dir.gen}">
+      <fileset dir="${dir.java}" />
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+  </target>
+
+  <!-- Compiles the Java source code. -->
+  <target name="g-compile" depends="g-preprocess">
+    <property name="java.source" location="${dir.java}" />
+    <mkdir dir="${dir.classes}" />
+    <javac debug="true" srcdir="${java.source}" destdir="${dir.classes}">
+      <classpath refid="classpath" />
+    </javac>
+  </target>
+
+  <!-- Gathers the resources to package with the class files. -->
+  <target name="g-resource" depends="g-resource-jndi" if="need.resources">
+    <copy todir="${dir.classes}">
+      <fileset dir="${dir.resources}" />
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+  </target>
+
+  <!-- Gathers the JNDI properties file, if needed. -->
+  <target name="g-resource-jndi" if="need.jndi">
+    <copy todir="${dir.classes}">
+      <fileset dir="${dir.ch00}/src/main/resources"
+               includes="jndi.properties"
+      />
+    </copy>
+  </target>
+
+  <!-- Creates the directory in which the archive files are created. -->
+  <target name="g-create-dist">
+    <mkdir dir="${dir.dist}" />
+  </target>
+
+  <!--
+    Override this target if you need to do any extra processing before creating
+    a JAR file.
+  -->
+  <target name="pre-jar" />
+
+  <!-- Packages the classes into a JAR file. -->
+  <target name="g-jar" depends="g-create-dist, g-compile, g-resource, pre-jar">
+    <property name="include.classes" value="**/*" />
+    <jbia.jar destfile="${jar.path}">
+      <fileset dir="${dir.classes}" includes="${include.classes}" />
+    </jbia.jar>
+  </target>
+
+  <!-- Gathers files in preparation to create WAR file. -->
+  <target name="g-web" depends="g-compile, g-resource">
+    <property name="exclude.files" value="" />
+    <copy todir="${dir.output}/${war.name}">
+      <fileset dir="${dir.main}/webapp" excludes="${exclude.files.war}" />
+    </copy>
+    <property name="include.classes" value="**/*" />
+    <copy todir="${dir.output}/${war.name}/WEB-INF/classes">
+      <fileset dir="${dir.classes}" includes="${include.classes}" />
+    </copy>
+  </target>
+
+  <!--
+    Override this target if you need to do any extra processing before creating
+    an EAR file.
+  -->
+  <target name="pre-ear" />
+
+  <!-- Packages the archives in the dist directory into an EAR file. -->
+  <target name="g-ear" depends="g-create-dist, g-compile, g-resource, pre-ear">
+    <copy todir="${dir.output}/${ear.name}">
+      <fileset dir="${dir.main}/enterpriseapp" />
+    </copy>
+    <property name="include.archives" value="**/*" />
+    <copy todir="${dir.output}/${ear.name}">
+      <fileset dir="${dir.dist}" includes="${include.archives}" />
+    </copy>
+    <property name="include.classes" value="**/*" />
+    <jbia.jar destfile="${ear.path}" basedir="${dir.output}/${ear.name}" />
+  </target>
+
+  <!--
+    Override this target if you need to do any extra processing before creating
+    a SAR file.
+  -->
+  <target name="pre-sar" />
+
+  <!-- Packages the archives in the dist directory into a SAR file. -->
+  <target name="g-sar" depends="g-create-dist, pre-sar">
+    <copy todir="${dir.output}/${sar.name}">
+      <fileset dir="${dir.main}/serviceapp" />
+    </copy>
+    <property name="include.archives" value="**/*" />
+    <copy todir="${dir.output}/${sar.name}">
+      <fileset dir="${dir.dist}" includes="${include.archives}" />
+    </copy>
+    <jbia.jar destfile="${sar.path}" basedir="${dir.output}/${sar.name}" />
+  </target>
+
+  <!--
+    Override this target if you need to do any extra processing before creating
+    a WAR file.
+  -->
+  <target name="pre-war" />
+
+  <!-- Packages the application into a WAR file. -->
+  <target name="g-war" depends="g-create-dist, g-web, pre-war">
+    <jbia.jar destfile="${war.path}" basedir="${dir.output}/${war.name}" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets are used to deploy applications.
+      NOTE: You can set "-Dno.deploy" on the ant command line to prevent the
+      application from being deployed, if for example you use one of the
+      NN-package targets.
+    ============================================================================
+  -->
+
+  <!-- Deploys the JAR file to the application server. -->
+  <target name="g-deploy-jar" unless="no.deploy">
+    <copy todir="${dir.deploy}" file="${jar.path}" verbose="true" />
+  </target>
+
+  <!-- Deploys the WAR file to the application server. -->
+  <target name="g-deploy-war" unless="no.deploy">
+    <copy todir="${dir.deploy}" file="${war.path}" verbose="true" />
+  </target>
+
+  <!-- Deploys the exploded WAR file to the application server. -->
+  <target name="g-deploy-war-exploded" unless="no.deploy">
+    <copy todir="${dir.deploy}/${war.name}">
+      <fileset dir="${dir.output}/${war.name}" />
+    </copy>
+  </target>
+
+  <!-- Deploys the EAR file to the application server. -->
+  <target name="g-deploy-ear" unless="no.deploy">
+    <copy todir="${dir.deploy}" file="${ear.path}" verbose="true" />
+  </target>
+
+  <!-- Deploys the exploded EAR file to the application server. -->
+  <target name="g-deploy-ear-exploded" unless="no.deploy">
+    <copy todir="${dir.deploy}/${ear.name}">
+      <fileset dir="${dir.output}/${ear.name}" />
+    </copy>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets initialize the application server. They
+      1) Remove the existing server configuration, if present
+      2) Create the server configuration from 'default'
+      3) Apply the example-specific configuration files
+    ============================================================================
+  -->
+  <!--
+    Target to reset application server and database. Do not use this target if
+    the application will not be using a database.
+  -->
+  <target name="g-reset" depends="g-reset-jboss, g-reset-db" />
+
+  <!-- Target to reset only the application server. -->
+  <target name="g-reset-jboss"
+          depends="g-clean-jboss, g-create-jboss, jboss-post"
+  />
+
+  <!-- 1a) Determine if JBoss AS was previously installed. -->
+  <target name="g-jboss-exists">
+    <condition property="exists.jboss.base">
+      <available file="${home.jboss}/client/jbossall-client.jar" />
+    </condition>
+  </target>
+
+  <!--
+    1b) Remove the server configuration (server/xxx) and default also,
+        if JBoss AS was previously installed.
+  -->
+  <target name="g-clean-jboss" depends="g-jboss-exists" if="exists.jboss.base">
+    <delete dir="${dir.server.base}/${jboss.server.config}"
+            failonerror="false"
+    />
+    <delete dir="${dir.server}" failonerror="false" />
+  </target>
+
+  <!-- 2) Create the server configuration -->
+  <target name="g-create-jboss"
+          depends="g-jboss-base, g-jboss-server, g-jboss-config"
+  />
+
+  <!--
+    2a) Unzip everything other than the server directory, if JBoss AS was not
+        previously installed.
+  -->
+  <target name="g-jboss-base" unless="exists.jboss.base">
+    <mkdir dir="${jboss.base}" />
+    <!--
+      Do a copy rather than an unzip because on Linux an unzip does not preserve
+      the timestamps on the files.
+    -->
+    <copy todir="${jboss.base}" preservelastmodified="true">
+      <zipfileset src="${jboss.zip}">
+        <patternset>
+          <include name="jboss-*/**" />
+          <exclude name="jboss-*/server/**" />
+        </patternset>
+      </zipfileset>
+    </copy>
+    <chmod perm="a+x">
+      <fileset dir="${home.jboss}/bin">
+        <include name="*.sh" />
+      </fileset>
+    </chmod>
+  </target>
+
+  <!-- 2b) Unzip the desired server configuration, and rename it. -->
+  <target name="g-jboss-server">
+    <!--
+      Do a copy rather than an unzip because on Linux an unzip does not preserve
+      the timestamps on the files. Unfortunately, the server/default/lib
+      directory does not get extracted, even with includeemptydirs set to true. 
+    -->
+    <copy todir="${jboss.base}"
+          preservelastmodified="true"
+          includeemptydirs="true"
+    >
+      <zipfileset src="${jboss.zip}">
+        <patternset>
+          <include name="jboss-*/server/${jboss.server.config}/**" />
+        </patternset>
+      </zipfileset>
+    </copy>
+    <move file="${jboss.base}/${jboss.version}/server/${jboss.server.config}"
+          tofile="${dir.server}"
+    />
+    <!--
+      The server/default/lib directory is empty and thus is not extracted from
+      the zip file, but we need it and JBoss AS expects it, so create it.
+    -->
+    <mkdir dir="${dir.server}/lib" />
+  </target>
+
+  <!-- 3) Gathers and deploys the JBoss configuration files. -->
+  <target name="g-jboss-config" if="need.config">
+    <copy todir="${dir.config}">
+      <fileset dir="${dir.config.src}" />
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+    <copy todir="${dir.server}" overwrite="true">
+      <fileset dir="${dir.config}" />
+    </copy>
+  </target>
+
+  <!--
+    Override this target if you need to do any extra processing after the
+    application server has been initialized.
+  -->
+  <target name="jboss-post" />
+
+
+  <!--
+    ============================================================================
+      The following targets initialize the database. They
+      1) Set the database properties based on database type
+      2) Create the database and database user
+      2) Copy the *-ds.xml and JDBC JAR files
+    ============================================================================
+  -->
+  <target name="g-reset-db" depends="g-db-create, g-db-copy, db-post" />
+
+  <!-- Define the database properties. -->
+  <target name="g-db-props"
+          depends="g-db-props-mysql, g-db-props-postgresql, g-db-props-hsqldb"
+  >
+    <echoproperties destfile="dbproperties.log" prefix="db." />
+    <echo>Using ${database.type}, database name is ${db.database}.</echo>
+  </target>
+
+  <!-- MySQL database properties. -->
+  <target name="g-db-props-mysql" if="database.mysql">
+    <property name="mysql.or.postgresql" value="mysql" />
+    <property name="database.type" value="mysql" />
+    <property name="database.jar" value="${mysql.jar}" />
+    <property name="database.user" value="${mysql.user}" />
+    <property name="database.password" value="${mysql.password}" />
+    <property name="db.driver" value="com.mysql.jdbc.Driver" />
+    <property name="db.url.base" value="jdbc:mysql://localhost:3306/" />
+    <property name="db.url" value="${db.url.base}mysql" />
+    <property name="db.sorter"
+              value="org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter"
+    />
+    <property name="db.generator" value="identity" />
+    <property name="db.dialect" value="org.hibernate.dialect.MySQLDialect" />
+    <property name="db.type.mapping" value="mySQL" />
+    <!--
+      The user name and password used to access the database. These are not the
+      root user and its password, but rather the user created as the owner of
+      the database, and therefore the user account used by the server to access
+      the database.
+    -->
+    <property name="db.user" value="jbossinaction" />
+    <property name="db.password" value="jbossinactionpwd" />
+  </target>
+
+  <!-- PostgreSQL database properties. -->
+  <target name="g-db-props-postgresql" if="database.postgresql">
+    <property name="mysql.or.postgresql" value="postgresql" />
+    <property name="database.type" value="postgresql" />
+    <property name="database.jar" value="${postgresql.jar}" />
+    <property name="database.user" value="${postgresql.user}" />
+    <property name="database.password" value="${postgresql.password}" />
+    <property name="db.driver" value="org.postgresql.Driver" />
+    <property name="db.url.base" value="jdbc:postgresql:" />
+    <property name="db.url" value="${db.url.base}postgres" />
+    <property name="db.sorter"
+              value="org.jboss.resource.adapter.jdbc.vendor.PostgreSQLExceptionSorter"
+    />
+    <property name="db.generator" value="identity" />
+    <property name="db.dialect"
+              value="org.hibernate.dialect.PostgreSQLDialect"
+    />
+    <property name="db.type.mapping" value="PostgreSQL 8.0" />
+    <!--
+      The user name and password used to access the database. These are not the
+      root user and its password, but rather the user created as the owner of
+      the database, and therefore the user account used by the server to access
+      the database.
+    -->
+    <property name="db.user" value="jbossinaction" />
+    <property name="db.password" value="jbossinactionpwd" />
+  </target>
+
+  <!-- Hypersonic (hsqldb) database properties. -->
+  <target name="g-db-props-hsqldb" if="database.hsqldb">
+    <property name="database.type" value="hsqldb" />
+    <property name="database.user" value="sa" />
+    <property name="database.password" value="" />
+    <property name="db.driver" value="org.hsqldb.jdbcDriver" />
+    <property name="db.url.base"
+              value="jdbc:hsqldb:${jboss.server.data.dir}${/}${db.database}${/}"
+    />
+    <property name="db.dialect" value="org.hibernate.dialect.HSQLDialect" />
+    <property name="db.type.mapping" value="Hypersonic SQL" />
+    <property name="db.generator" value="identity" />
+    <!-- Use the same username and password as for the root. -->
+    <property name="db.user" value="sa" />
+    <property name="db.password" value="" />
+  </target>
+
+  <!-- Create the database and an account for that database. -->
+  <target name="g-db-create" depends="g-db-props" unless="database.hsqldb">
+    <echo message="Initialize the ${mysql.or.postgresql} database named ${jboss.server}."
+    />
+    <sql driver="${db.driver}"
+         url="${db.url}"
+         userid="${database.user}"
+         password="${database.password}"
+         onerror="continue"
+         src="${dir.db}/${mysql.or.postgresql}.sql"
+         print="true"
+         autocommit="true"
+    >
+      <classpath location="${database.jar}" />
+    </sql>
+  </target>
+
+  <!-- Deploys the *-ds.xml file and driver for the database. -->
+  <target name="g-db-copy" depends="g-db-props, g-db-deploy-jar">
+    <copy file="${db.dsxml}"
+          tofile="${dir.config}/${jboss.server}-${database.type}-ds.xml"
+    >
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+    <copy file="${dir.config}/${jboss.server}-${database.type}-ds.xml"
+          todir="${dir.deploy}"
+          verbose="true"
+    />
+  </target>
+  <target name="g-db-deploy-jar" unless="database.hsqldb">
+    <copy file="${database.jar}" todir="${dir.lib}" verbose="true" />
+  </target>
+
+  <!--
+    Override this target if you need to do any extra processing after the
+    database has been initialized.
+  -->
+  <target name="db-post" />
+
+
+  <!--
+    ============================================================================
+      The following targets optionally generate scripts used to run client
+      applications.
+    ============================================================================
+  -->
+
+  <target name="g-script" if="need.scripts">
+    <antcall target="g-script-windows" />
+    <antcall target="g-script-linux" />
+  </target>
+
+  <target name="g-script-windows" if="os.windows">
+    <copy todir="${dir.dist}">
+      <fileset dir="${dir.script}" includes="*.bat" />
+      <filterchain>
+        <expandproperties />
+      </filterchain>
+    </copy>
+  </target>
+
+  <target name="g-script-linux" if="os.linux">
+    <!-- Strip the 'cr' character from the Unix/Linux scripts. -->
+    <property name="extra.eol.char" value="\r" />
+    <copy todir="${dir.dist}">
+      <fileset dir="${dir.script}" excludes="*.bat" />
+      <filterchain>
+        <expandproperties />
+        <deletecharacters chars="${extra.eol.char}" />
+      </filterchain>
+    </copy>
+    <chmod perm="a+x" type="file" verbose="true">
+      <fileset dir="${dir.dist}" includes="**/*.sh" />
+      <fileset dir="${dir.dist}" includes="**/*.conf" />
+    </chmod>
+  </target>
+
+
+  <!--
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <!--
+    Removes all generated files, the JBoss AS configuration, and the database.
+  -->
+  <target name="g-clean-all" depends="g-clean, g-clean-jboss, g-clean-db" />
+
+  <!-- Removes all generated files. -->
+  <target name="g-clean" depends="g-init">
+    <delete dir="${dir.output}" />
+  </target>
+
+  <!-- Removes the database. -->
+  <target name="g-clean-db" depends="g-db-props" if="mysql.or.postgresql">
+    <sql driver="${db.driver}"
+         url="${db.url}"
+         userid="${database.user}"
+         password="${database.password}"
+         onerror="continue"
+         src="${dir.db}/${mysql.or.postgresql}-clean.sql"
+         print="true"
+         autocommit="true"
+    >
+      <classpath location="${database.jar}" />
+    </sql>
+  </target>
+
+</project>

@@ -1,0 +1,128 @@
+<!--
+#  Copyright 2008, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+<title>JBIA - Deploying Applications</title>
+</head>
+
+<body>
+
+<h1>Ch 3 - Deploying Applications</h1>
+<p>Some build targets create an application server configuration named <code>
+deployment</code>. After the build, to run the application server, open another command
+window, <code>cd</code> to the applications server's <code>bin</code> directory,
+and enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c deployment</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c deployment</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Some targets create and initialize a database named deploymentdb.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">01</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>3.2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds, packages and deploys several applications used to
+    demonstrate various class loading, loader repository and class scoping
+    concepts.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Start the application server and open a browser at <a target="_blank"
+  href="http://localhost:8080/route">http://localhost:8080/route</a>. Follow the
+instructions given by the application.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">02</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>3.3.1</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds the jarFinder utility.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>As an example of running the jarFinder, to search for the class <code>org.jboss.aop.advice.Interceptor</code>
+within the JBoss Application Server installation directory, enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">target/dist/jarFinder.sh $JBOSS_HOME
+    org.jboss.aop.advice.Interceptor.class</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">target\dist\jarFinder.bat %JBOSS_HOME%
+    org.jboss.aop.advice.Interceptor.class</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Note that these instructions to run jarFinder are different than what is
+given in the book because we provided a script that you can use to easily run
+jarFinder.</p>
+<p>This build target does not create an application server configuration.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">03</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>3.4.1, 3.4.2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Builds and deploys a data source and a Hibernate archive, and
+    initializes the database.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>Start the application server and open a browser at <a target="_blank"
+  href="http://localhost:8080/video">http://localhost:8080/video</a>. Enter some
+data and click the Add button. The bottom of the page contains a table listing
+all entries made so far.</p>
+<hr />
+<p align="center">&copy; 2008, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>

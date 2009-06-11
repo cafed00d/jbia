@@ -1,0 +1,12 @@
+#Ant properties
+#Thu Dec 25 10:08:16 CST 2008
+db.database=enterprisedb
+db.datasource=jdbc/enterpriseDS
+db.dialect=org.hibernate.dialect.HSQLDialect
+db.driver=org.hsqldb.jdbcDriver
+db.dsxml=c\:\\jbia-src\\ch00/src/main/db/jbia-ds.xml
+db.generator=identity
+db.password=
+db.type.mapping=Hypersonic SQL
+db.url.base=jdbc\:hsqldb\:${jboss.server.data.dir}${/}enterprisedb${/}
+db.user=sa

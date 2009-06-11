@@ -1,0 +1,336 @@
+<!--
+#  Copyright 2007, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+<title>JBIA - Securing Web Applications</title>
+</head>
+
+<body>
+
+<h1>Ch 7 - Configuring Enterprise Applications</h1>
+<p>All build targets create an application server configuration
+named <code> security</code>. After the build, to run the application
+server, open another command window, <code>cd</code> to the applications
+server's <code>bin</code> directory, and enter:</p>
+<table class="command">
+	<tr>
+		<td class="commandText">./run.sh -c enterprise</td>
+		<td>(Linux)</td>
+	</tr>
+	<tr>
+		<td class="commandText">run -c enterprise</td>
+		<td>(Windows)</td>
+	</tr>
+</table>
+<p>None of the targets creates a database.</p>
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">01</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.2</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages a simple client-server greeting
+		application as demonstrated in the walk-through in section 7.2.</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Run the <code>ant 01-client</code> target to run the client
+application that will produce the following output on the client: <br />
+<br />
+<code> <pre>
+     [java] Hello, world!
+     [java] Hola, mundo!
+     [java] Salam, donya!
+     [java] Bonjour, monde!
+     [java] Ciao, mondo!
+
+BUILD SUCCESSFUL
+Total time: 3 seconds
+</pre> </code></p>
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">02</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.4.1 & 7.4.2</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages a series of simple EJBs that bind into
+		JNDI in different ways.</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Run the <code>ant 02-client</code> target to run the client
+application that will try to call the various EJBs. If you look on the
+JBoss console, you'll see the following output:<br />
+<br />
+<code> <pre>
+INFO [STDOUT] Remote call to default printer successful.
+INFO [STDOUT] Local call to default printer successful.
+INFO [STDOUT] Remote call to annotation printer (with first bound name) successful.
+INFO [STDOUT] Local call to annotation printer successful.
+INFO [STDOUT] Remote call to annotation printer (with second bound name) successful.
+INFO [STDOUT] Local call to annotation printer successful.
+INFO [STDOUT] Remote call to config printer successful.
+INFO [STDOUT] Remote call to config printer successful.
+INFO [STDOUT] Remote call to override printer successful.
+INFO [STDOUT] Local call to override printer successful.
+</pre> </code> <br />
+The interesting thing here is not the output, but rather the code /
+configuration. Look through the client and EJB code (and read section
+7.4.1 & 7.4.2 of the book) to see the different ways that EJBs can be
+bound into JNDI, and how they can be looked up.</p>
+
+<p class="warning">WARNING: Overriding the JNDI binding annotations using the XML deployment 
+descriptor does not work in JBoss 5.0 GA. Hopefully, this will be fixed in a patch release,
+but until then we have commented out the client code that calls the bean with the overridden
+binding.</p>
+
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">03</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.5.1</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and deploys a simple video list application that uses
+		Hibernate Session injection inside of an EJB.</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Start the application server and open a browser at <a target="_blank"
+	href="http://localhost:8080/video">http://localhost:8080/video</a>.
+Enter some data and click the Add button. The bottom of the page
+contains a table listing all entries made so far.</p>
+
+<p class="warning">WARNING: This functionality worked in the early Beta releases, but no longer seems to 
+work in GA. We are trying to determine why. We will post an update to the code once we figure out 
+how to get it to work. Here is the forum post that is related to the issue 
+<a target="_blank" href="http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4180916">
+http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4180916</a></p>
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">04</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.6</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages an interest calculator application with a
+		JMX service object that allows you to change the interest rate for the
+		calculator through the JMX console.</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Navigate to <a
+	href="http://localhost:8080/calculator/index.faces">http://localhost:8080/calculator/index.faces</a>
+to see the interest calculator. Try out a few calculations and you'll
+see that the interest rate is set to 5.25.</p>
+<p>Next, pull up the JMX console by going to <a target="_blank"
+	href="http://localhost:8080/jmx-console">http://localhost:8080/jmx-console</a>.
+Navigate to the <code>jbia:service=interestRateManager</code> service
+and change the interest rate to a different number (e.g. 7.55). Then go
+back to the application and try calculating again. You'll see that the
+interest rate has changed.</p>
+
+<p class="warning">WARNING: This functionality worked in the Beta4 release, but no longer seems to 
+work in GA. We are trying to determine why. We will post an update to the code once we figure out 
+how to get it to work. Here is the forum post that is related to the issue 
+<a target="_blank" href="http://www.jboss.com/index.html?module=bb&op=viewtopic&t=142511">
+http://www.jboss.com/index.html?module=bb&op=viewtopic&t=142511</a></p>
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">05</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.7</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages the same client-server greeting
+		application as the 01 target, but changes the transport protocol to be
+		RMI instead of the standard Socket-based transport protocol.</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Run the <code>ant 05-client</code> target to run the client
+application that will produce the same output as in the first example.</p>
+<p>Go to the JMX console (<a target="_blank"
+	href="http://localhost:8080/jmx-console">http://localhost:8080/jmx-console</a>)
+and look under the <b>jboss.remoting</b> JMX domain. Look for the MBean
+that is registered with the following name:<br />
+<code>dataType=invocation,enableTcpNoDelay=true,host=127.0.0.1,marshaller=org.jboss.invocation.unified.marshall.InvocationMarshaller,port=4446,service=invoker,socketTimeout=600000,transport=<b>rmi</b>,unmarshaller=org.jboss.invocation.unified.marshall.InvocationUnMarshaller</code>
+</p>
+<p>If you were to run the 01 target and look at this bean, you would
+see that it looked like this:<br />
+<code>dataType=invocation,enableTcpNoDelay=true,host=127.0.0.1,marshaller=org.jboss.invocation.unified.marshall.InvocationMarshaller,port=4446,service=invoker,socketTimeout=600000,transport=<b>socket</b>,unmarshaller=org.jboss.invocation.unified.marshall.InvocationUnMarshaller</code>
+</p>
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">06</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.8.1 & 7.8.3</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages an EJB interest calculator with security
+		annotations enabled, then accesses the EJB through a non-integrated
+		(outside of the container) client</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Run the <code>ant 06-client</code> target to run the client
+application which uses the SecurityAssociation method of passing
+credentials to the EJB. This will try to access the <code>com.manning.jbia.ejbsecurity.ejb.StatelessCalculatorBean</code>
+that has security annotations set on it. Open the source code for this
+class to see what annotations are set.</p>
+
+<p>The client will try to access the EJB using four different users
+that have different roles. Look at the <code>src/alt/07/resources/myroles.properties</code>
+file to see what roles these user have (the 07-client output will print
+this out too).</p>
+
+<p>You can also try to log in to <a
+	href="http://localhost:8080/calculator/index.faces" target="_blank">http://localhost:8080/calculator/index.faces</a>
+as user <code>admin</code> with password <code>special</code>. This
+shows you that logging into a web application will propagate the
+security credentials to the EJB server as well.
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">07</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.8.2 & 7.8.3</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages an EJB interest calculator with XML-based
+		security enabled, then accesses the EJB through a non-integrated
+		(outside of the container) client</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Run the <code>ant 07-client</code> target to run the client
+application which uses the SecurityAssociation method of passing
+credentials to the EJB. This will try to access the <code>com.manning.jbia.ejbsecurity.ejb.StatelessCalculatorBean</code>
+that has security applied to it via the META-INF/ejb-jar.xml file.</p>
+
+<p>The client will try to access the EJB using four different users
+that have different roles. Look at the <code>src/alt/08/resources/myroles.properties</code>
+file to see what roles these user have (the 08-client output will print
+this out too).</p>
+
+<p>You can also try to log in to <a
+	href="http://localhost:8080/calculator/index.faces" target="_blank">http://localhost:8080/calculator/index.faces</a>
+as user <code>admin</code> with password <code>special</code>. This
+shows you that logging into a web application will propagate the
+security credentials to the EJB server as well.
+<hr />
+
+<table class="target">
+	<tr>
+		<th>Target:</th>
+		<td class="targetNumber">08</td>
+	</tr>
+	<tr>
+		<th>Section:</th>
+		<td>7.8.4</td>
+	</tr>
+	<tr>
+		<th>Description:</th>
+		<td>Builds and packages an EJB-based greeting application that can be accessed via a standalone client over SSL</td>
+	</tr>
+	<tr>
+		<th colspan="2">After the build:</th>
+	</tr>
+</table>
+<p>Start your server using the following command:</p>
+<code>./run.sh -Djavax.net.ssl.keyStore=../server/enterprise/conf/server.keystore -Djavax.net.ssl.keyStorePassword=serverpass -c enterprise</code>
+<p>Next run the <code>ant 08-client</code> target to run the client
+application which will download the SSL-based EJB proxy and call the server. Note that the client runs with the following arguments, which point to the client trust store:</p>
+<code>java -Djavax.net.ssl.trustStrore=c:\jbia-src\ch07\target/keystore/client.truststore -Djavax.net.ssl.trustStorePassword=clientpass com.manning.jbia.Client</code>
+<p>The output of the client application should look something like this:
+<code> <pre>
+     [echo] java -Djavax.net.ssl.trustStrore=c:\jbia-src\ch07\target/keystore/client.truststore -Djavax.net.ssl.trustStorePassword=clientpass com.manning.jbia.Client
+     [java] Hello, world!
+     [java] Hola, mundo!
+     [java] Salam, donya!
+     [java] Bonjour, monde!
+     [java] Ciao, mondo!
+
+BUILD SUCCESSFUL
+Total time: 3 seconds
+</pre> </code></p>
+
+<hr />
+
+<p align="center">© 2007, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>

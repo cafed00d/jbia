@@ -1,0 +1,270 @@
+<!--
+#  Copyright 2008, Javid Jamae and Peter Johnson
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy
+#  of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<link rel="STYLESHEET" href="../ch00/image/jbia.css" type="text/css" />
+<title>JBIA - Going to Production</title>
+</head>
+
+<body>
+
+<h1>Ch 15 - Going to Production</h1>
+<p>Most build targets create an application server configuration named <code>
+production</code>. After the build, to run the application server, open another command
+window, <code>cd</code> to the applications server's <code>bin</code> directory,
+and enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c production</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c production</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Some targets create a database named productiondb.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">01</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>15.2.1, 15.2.2</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates two application server configurations, using the Service
+    Binding Manager to assign unique ports.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>To run the second application server, open another command window, <code>cd</code>
+to the applications server's <code>bin</code> directory, and enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c production-2 -Djboss.service.binding.set=ports-01</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c production-2 -Djboss.service.binding.set=ports-01</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Once both application servers are running, you can access the first via
+the URL <a target="_blank" href="http://localhost:8080">http://localhost:8080</a>
+and the second via the URL <a target="_blank" href="http://localhost:8180">http://localhost:8180</a>.</p>
+<p>To further verify that the application servers are different, you could
+deploy an application to one server and verify that the application is
+accessible only from that server's URL.</p>
+<p>To shut down both application servers, open another command window and
+enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./shutdown.sh -s localhost:1099<br />
+    ./shutdown.sh -s localhost:1199</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">shutdown.bat -s localhost:1099<br />
+    shutdown.bat -s localhost:1199</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">02</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>15.2.1, 15.2.3</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates two application server configurations, using multi-homing to
+    prevent port conflicts.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>To run the application servers, open two command windows. In both
+windows, <code>cd</code> to the applications server's <code>bin</code>
+directory. Then in the first command window enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c production -b localhost</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c production -b localhost</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>and in the second command window enter (substituting your PC's IP address
+or actual host name for XXX):</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./run.sh -c production-2 -b XXX</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">run -c production-2 -b XXX</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<p>Once both application servers are running, you can access the first via
+the URL <a target="_blank" href="http://localhost:8080">http://localhost:8080</a>
+and the second via the URL http://XXX:8080.</p>
+<p>To further verify that the application servers are different, you could
+deploy an application to one server and verify that the application is
+accessible only from that server's URL.</p>
+<p>To shut down both application servers, open another command window and
+enter:</p>
+<table class="command">
+  <tr>
+    <td class="commandText">./shutdown.sh -s localhost:1099<br />
+    ./shutdown.sh -s XXX:1099</td>
+    <td>(Linux)</td>
+  </tr>
+  <tr>
+    <td class="commandText">shutdown.bat -s localhost:1099<br />
+    shutdown.bat -s XXX:1099</td>
+    <td>(Windows)</td>
+  </tr>
+</table>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">03</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>15.5</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates an application server that uses MySQL or PostgreSQL instead
+    of Hypersonic.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<p>The datasource is declared in the <code>server/production/deploy/production-XXX-ds.xml</code>
+file where XXX is either <code>mysql</code> or <code>postgresql</code>.</p>
+<p>After starting the application server, you could check the productiondb
+database using the administration tool for your database. The productiondb
+database should contain tables for messaging (jbm_*), Quartz (qrtz_*), and a few
+other services. Note that the Quartz tables are not present if you are using 
+JBoss AS 5.0.1.</p>
+<hr />
+<table class="target">
+  <tr>
+    <th>Target:</th>
+    <td class="targetNumber">04</td>
+  </tr>
+  <tr>
+    <th>Section:</th>
+    <td>15.6</td>
+  </tr>
+  <tr>
+    <th>Description:</th>
+    <td>Creates two application server configurations, using the Service
+    Binding Manager to assign unique ports. Generates scripts that can be used
+    to register the application servers as services.<br />
+    This target requires JBoss Native. You must set the <code>home.native</code>
+    property in the <code>ch00/build.properties</code> file.</td>
+  </tr>
+  <tr>
+    <th colspan="2">After the build:</th>
+  </tr>
+</table>
+<h3>Windows</h3>
+<p>The build creates two batch files, service-production.bat and
+service-production-2.bat, both in the %JBOSS_HOME%\bin directory. To register
+the services, open a command prompt, cd to the <code>bin</code> directory and
+enter:</p>
+<pre>service-production install</pre>
+<pre>service-production-2 install</pre>
+<p>You can start the application servers using the Services Control Panel
+applet; look for services whose names start with "JBoss in Action." Or you can
+open a command prompt and enter:</p>
+<pre>net start jbia-production</pre>
+<pre>net start jbia-production-2</pre>
+<p>You can stop the services by entering:</p>
+<pre>net stop jbia-production</pre>
+<pre>net stop jbia-production-2</pre>
+<p>You can uninstall the services by entering:</p>
+<pre>service-production uninstall</pre>
+<pre>service-production-2 uninstall</pre>
+<h3>RedHat Linux</h3>
+<p>To complete the registration of the servers, open a command window, log in as
+root, and run this script:</p>
+<pre>target/linux/install.sh</pre>
+<p>After the script completes, register the services by entering:</p>
+<pre>chkconfig --add jbia-production</pre>
+<pre>chkconfig --add jbia-production-2</pre>
+<p>You can start the application servers by entering:</p>
+<pre>service jbia-production start</pre>
+<pre>service jbia-production-2 start</pre>
+<p>You can stop the services by entering:</p>
+<pre>service jbia-production stop</pre>
+<pre>service jbia-production-2 stop</pre>
+<p>You can uninstall the services by entering:</p>
+<pre>chkconfig --del jbia-production</pre>
+<pre>chkconfig --del jbia-production-2</pre>
+<pre>rm /etc/init.d/jbia-production*</pre>
+<h3>Ubuntu</h3>
+<p>To complete the registration of the servers, open a command window and run
+the install script:</p>
+<pre>sudo target/linux/install.sh</pre>
+<p>To start the application servers each time the system is booted, enter the
+following commands:</p>
+<pre>cd /etc/rc2.d</pre>
+<pre>sudo ln -s ../init.d/jbia-production S99jbia-production</pre>
+<pre>sudo ln -s ../init.d/jbia-production-2 S99jbia-production-2</pre>
+<p>You can start the application servers by entering:</p>
+<pre>sudo /etc/init.d/jbia-production start</pre>
+<pre>sudo /etc/init.d/jbia-production-2 start</pre>
+<p>You can stop the services by entering:</p>
+<pre>sudo /etc/init.d/jbia-production stop</pre>
+<pre>sudo /etc/init.d/jbia-production-2 stop</pre>
+<p>You can uninstall the services by entering:</p>
+<pre>sudo rm /etc/init.d/jbia-production*</pre>
+<pre>sudo rm /etc/rc2.d/S99jbia-production*</pre>
+<h3>Linux</h3>
+<p>NOTE: The Linux script has been tested on Fedora Core 6 and 8 and Ubuntu
+7.11 and 8.04. You might have to tweak the scripts or the configuration to get
+the application servers installed as services on other Linux distros.</p>
+<h3>Windows and Linux</h3>
+<p>Once the application servers are running, you can access the first via
+the URL <a target="_blank" href="http://localhost:8080">http://localhost:8080</a>
+and the second via the URL <a target="_blank" href="http://localhost:8180">http://localhost:8180</a>.</p>
+<hr />
+<p align="center">&copy; 2008, Javid Jamae and Peter Johnson</p>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+//==============================================================================
+//  Copyright 2008, Javid Jamae and Peter Johnson
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+//  use this file except in compliance with the License. You may obtain a copy
+//  of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+//  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+//  License for the specific language governing permissions and limitations
+//  under the License.
+//==============================================================================
+//
+// These statements create the roles and users used by the access control
+// example.They are inserted into the jboss-portal.sar/conf/hibernate/user/
+// setup.txt file.
+
+   // Role retained from the setup.txt file:
+   HibernateRoleImpl userRole = new HibernateRoleImpl("User", "Users");
+
+   // New roles added for the access control example:
+   HibernateRoleImpl role1 = new HibernateRoleImpl("Role1", "Role 1");
+   HibernateRoleImpl role2 = new HibernateRoleImpl("Role2", "Role 2");
+   HibernateRoleImpl role3 = new HibernateRoleImpl("Role3", "Role 3");
+   HibernateRoleImpl role4 = new HibernateRoleImpl("Role4", "Role 4");
+   HibernateRoleImpl role5 = new HibernateRoleImpl("Role5", "Role 5");
+
+   // The new users, one for each role.
+   HibernateUserImpl user1 = new HibernateUserImpl("user1");
+   user1.setPassword(Tools.md5AsHexString("user1"));
+   user1.setRealEmail("user1@portal.com");
+   user1.setViewRealEmail(true);
+   user1.setEnabled(true);
+   user1.getRoles().add(role1);
+   role1.getUsers().add(user1);
+   user1.getRoles().add(userRole);
+   userRole.getUsers().add(user1);
+
+   // 
+   HibernateUserImpl user2 = new HibernateUserImpl("user2");
+   user2.setPassword(Tools.md5AsHexString("user2"));
+   user2.setRealEmail("user2@portal.com");
+   user2.setViewRealEmail(true);
+   user2.setEnabled(true);
+   user2.getRoles().add(role2);
+   role2.getUsers().add(user2);
+   user2.getRoles().add(userRole);
+   userRole.getUsers().add(user2);
+
+   // 
+   HibernateUserImpl user3 = new HibernateUserImpl("user3");
+   user3.setPassword(Tools.md5AsHexString("user3"));
+   user3.setRealEmail("user3@portal.com");
+   user3.setViewRealEmail(true);
+   user3.setEnabled(true);
+   user3.getRoles().add(role3);
+   role3.getUsers().add(user3);
+   user3.getRoles().add(userRole);
+   userRole.getUsers().add(user3);
+
+   // 
+   HibernateUserImpl user4 = new HibernateUserImpl("user4");
+   user4.setPassword(Tools.md5AsHexString("user4"));
+   user4.setRealEmail("user4@portal.com");
+   user4.setViewRealEmail(true);
+   user4.setEnabled(true);
+   user4.getRoles().add(role4);
+   role4.getUsers().add(user4);
+   user4.getRoles().add(userRole);
+   userRole.getUsers().add(user4);
+
+   // 
+   HibernateUserImpl user5 = new HibernateUserImpl("user5");
+   user5.setPassword(Tools.md5AsHexString("user5"));
+   user5.setRealEmail("user5@portal.com");
+   user5.setViewRealEmail(true);
+   user5.setEnabled(true);
+   user5.getRoles().add(role5);
+   role5.getUsers().add(user5);
+   user5.getRoles().add(userRole);
+   userRole.getUsers().add(user5);
+   
