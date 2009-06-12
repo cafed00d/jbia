@@ -255,6 +255,9 @@ following commands:</p>
 <p>You can uninstall the services by entering:</p>
 <pre>sudo rm /etc/init.d/jbia-production*</pre>
 <pre>sudo rm /etc/rc2.d/S99jbia-production*</pre>
+<p>In addition, the owner of $JBOSS_HOME was set to 'jboss'. Therefore you need
+to also change the onwership back to your account (XXX in the following):
+<pre>sudo chown -R XXX $JBOSS_HOME</pre>
 <h3>Linux</h3>
 <p>NOTE: The Linux script has been tested on Fedora Core 6 and 8 and Ubuntu
 7.11 and 8.04. You might have to tweak the scripts or the configuration to get

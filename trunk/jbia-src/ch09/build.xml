@@ -363,14 +363,6 @@
         <replacestring from="Enable JBossWS message tracing"
                        to="Enable JBossWS message tracing -->"
         />
-        <!--
-          It does not help to turn the ws message logging on if the threshold
-          level is set to DEBUG (which it is by default), so also set the
-          threshold to TRACE.
-        -->
-        <replacestring from="${jboss.server.log.threshold}"
-                       to="TRACE"
-        />
       </filterchain>
     </copy>
     <copy todir="${dir.server}" overwrite="true" verbose="true">

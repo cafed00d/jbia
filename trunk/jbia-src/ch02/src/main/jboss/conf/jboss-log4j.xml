@@ -7,7 +7,7 @@
 <!--                                                                       -->
 <!-- ===================================================================== -->
 
-<!-- $xId: log4j.xml 64096 2007-07-17 14:36:23Z stan.silvert@jboss.com $ -->
+<!-- $xId: jboss-log4j.xml 87678 2009-04-22 16:47:08Z bstansberry@jboss.com $ -->
 
 <!--
    | For more configuration information and examples see the Jakarta Log4j
@@ -27,23 +27,20 @@
    <appender name="FILE" class="org.jboss.logging.appender.RollingFileAppender">
       <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
       <param name="File" value="${jboss.server.log.dir}/server.log"/>
-      <!-- 
-         JBIA: Changed Append property to true
-      -->
       <param name="Append" value="true"/>
-      <!-- 
-         Set the threshold via a system property. Note this is parsed by log4j,
-         so the full JBoss system property format is not supported; e.g.
-         setting a default via ${jboss.server.log.threshold:WARN} will not work.
-       -->
+      <!-- In AS 5.0.x the server log threshold was set by a system
+           property. In 5.1 and later we are instead using the system
+           property to set the priority on the root logger (see <root/> below)
       <param name="Threshold" value="${jboss.server.log.threshold}"/>
-
+      -->
+      
       <!-- 
          JBIA: Commented out these DailyRollingFileAppender parameters
       -->
       <!-- Rollover at midnight each day
       <param name="DatePattern" value="'.'yyyy-MM-dd"/>
       -->
+
       <!-- Rollover at the top of each hour
       <param name="DatePattern" value="'.'yyyy-MM-dd-HH"/>
       -->
@@ -55,8 +52,8 @@
       <param name="MaxBackupIndex" value="20"/>
 
       <layout class="org.apache.log4j.PatternLayout">
-         <!-- The default pattern: Date Priority [Category] Message\n -->
-         <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
+         <!-- The default pattern: Date Priority [Category] (Thread) Message\n -->
+         <param name="ConversionPattern" value="%d %-5p [%c] (%t) %m%n"/>
 
          <!-- The full pattern: Date MS Priority [Category] (Thread:NDC) Message\n
          <param name="ConversionPattern" value="%d %-5r %-5p [%c] (%t:%x) %m%n"/>
@@ -239,31 +236,46 @@
       <priority value="INFO"/>
    </category>
    
-   <!-- Limit JSF logging to DEBUG.  FINER and FINEST will not be logged -->
-   <category name="javax.enterprise.resource.webcontainer.jsf">
-     <priority value="DEBUG" />
-   </category>
-
    <!-- Limit the jacorb category to WARN as its INFO is verbose -->
    <category name="jacorb">
       <priority value="WARN"/>
    </category>
-
-   <!-- Set the logging level of the JSF implementation -->
+   
+   <!-- Set the logging level of the JSF implementation that uses
+      | java.util.logging. The jdk logging levels can be controlled
+      | through the org.jboss.logging.log4j.JDKLevel class that
+      | in addition to the standard log4j levels it adds support for
+      | SEVERE, WARNING, CONFIG, FINE, FINER, FINEST
+   -->
    <category name="javax.enterprise.resource.webcontainer.jsf">
-      <priority value="INFO"/>
+     <priority value="INFO" class="org.jboss.logging.log4j.JDKLevel"/>
    </category>
-
+   
    <!-- Limit the org.jgroups category to WARN as its INFO is verbose -->
    <category name="org.jgroups">
       <priority value="WARN"/>
    </category>
-
+   
    <!-- Limit the org.quartz category to INFO as its DEBUG is verbose -->
    <category name="org.quartz">
       <priority value="INFO"/>
    </category>
-
+   
+   <!-- Limit the com.sun category to INFO as its FINE is verbose -->
+   <category name="com.sun">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the sun category to INFO as its FINE is verbose -->
+   <category name="sun">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the javax.xml.bind category to INFO as its FINE is verbose -->
+   <category name="javax.xml.bind">
+      <priority value="INFO"/>
+   </category>
+   
    <!-- Limit JBoss categories
    <category name="org.jboss">
       <priority value="INFO"/>
@@ -275,6 +287,26 @@
       <priority value="INFO"/>
    </category>
 
+   <!-- Limit the verbose facelets compiler -->
+   <category name="facelets.compiler">
+      <priority value="WARN"/>
+   </category>
+   
+   <!-- Limit the verbose ajax4jsf cache initialization -->
+   <category name="org.ajax4jsf.cache">
+      <priority value="WARN"/>
+   </category>
+   
+   <!-- Limit the verbose embedded jopr categories -->
+   <category name="org.rhq">
+      <priority value="WARN"/>
+   </category>
+   
+   <!-- Limit the verbose seam categories -->
+   <category name="org.jboss.seam">
+      <priority value="WARN"/>
+   </category>
+   
    <!-- Show the evolution of the DataSource pool in the logs [inUse/Available/Max]
    <category name="org.jboss.resource.connectionmanager.JBossManagedConnectionPool">
      <priority value="TRACE"/>
@@ -292,19 +324,19 @@
    <category name="org.jboss.serial">
       <priority value="INFO"/>
    </category>
-
+  
    <!-- Decrease the priority threshold for the org.jboss.varia category
    <category name="org.jboss.varia">
      <priority value="DEBUG"/>
    </category>
    -->
-
+   
    <!-- Enable JBossWS message tracing
    <category name="org.jboss.ws.core.MessageTrace">
      <priority value="TRACE"/>
    </category>
    -->
-
+   
    <!--
       | An example of enabling the custom TRACE level priority that is used
       | by the JBoss internals to diagnose low level details. This example
@@ -386,6 +418,19 @@
    <!-- ======================= -->
 
    <root>
+      <!-- 
+         Set the root logger priority via a system property. Note this is parsed by log4j,
+         so the full JBoss system property format is not supported; e.g.
+         setting a default via ${jboss.server.log.threshold:WARN} will not work.         
+       -->
+      <!--
+         JBIA: Set the threshold to DEBUG (default is INFO, which does not fill
+         up the log file enough to illustrate multiple files created).
+      -->
+      <!--
+      <priority value="${jboss.server.log.threshold}"/>
+       -->
+      <priority value="DEBUG"/>
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
    </root>
