@@ -1,3 +1,5 @@
+#summary Identifies JBoss AS version for each version of the source
+
 = Version Information =
 
 The download file contains a version number. In addition, the build places a version number, and other identifying information, into the META-INF/MANIFEST.MF file of the archive(s) created.
