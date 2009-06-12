@@ -184,7 +184,7 @@
             <attribute name="Chapter" value="${book.chapter}" />
             <attribute name="URL" value="http://www.manning.com/jamae" />
             <attribute name="Authors" value="Javid Jamae, Peter Johnson" />
-            <attribute name="Version" value="1.1" />
+            <attribute name="Version" value="2.0" />
             <attribute name="Built-on" value="${time.build}" />
           </section>
         </manifest>
