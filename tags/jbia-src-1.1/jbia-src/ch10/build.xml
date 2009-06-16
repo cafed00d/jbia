@@ -1,0 +1,509 @@
+<?xml version="1.0"?>
+<!-- 
+ *  Copyright 2008, Javid Jamae and Peter Johnson
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy
+ *  of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+-->
+<!-- ===========================================================================
+
+                               JBoss in Action
+                          Ch 10 & 11 - JBoss Portal
+
+  This Ant build script is used to build and deploy the example image portlet
+  used in the JBoss Portal chapters.
+
+============================================================================ -->
+<project name="portal" default="help" basedir=".">
+
+  <!-- Specifies the location of the global include and properties files -->
+  <property name="dir.ch00" location="../ch00" />
+
+  <!-- Get properties related to JBoss AS 4.2.1. -->
+  <property file="build.properties" />
+
+  <!-- Get properties related to the user's environment. -->
+  <property file="${dir.ch00}/build.properties" />
+
+  <!-- Import various properties and targets -->
+  <import file="${dir.ch00}/build-include.xml" />
+
+  <!-- Override help target from include script to avoid confusion. -->
+  <target name="help">
+    <echo>usage: ant NN</echo>
+    <echo>where NN is 01 through 09</echo>
+    <echo>Enter "ant -p" for full target list.</echo>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The major targets build everything needed for each example in the chapter.
+      Note that only one example can be built at a time because almost all
+      examples use the same base code and typically just change configuration.
+      In addition, each major target rebuilds the application server, and
+      possibly initializes the database, to guarantee correct operation of the
+      example. You should ensure that the application server is not running
+      before invoking any of these targets.
+    ============================================================================
+  -->
+  <target description="(10.2) Creates a portal with the basic image portlet."
+          name="01"
+          depends="init-01, g-init, g-reset, 01-package"
+  />
+  <target description="(10.3) Creates a portal with the image portet, with an instance defined."
+          name="02"
+          depends="init-02, g-init, g-reset, 02-package"
+  />
+  <target description="(10.4) Creates a portal with the image portlet, with an instance and a window/object defined."
+          name="03"
+          depends="init-03, g-init, g-reset, 03-package"
+  />
+  <target description="(11.1) Creates a portal with the image portlet, with an empty renderer."
+          name="04"
+          depends="init-04, g-init, g-reset, 04-package"
+  />
+  <target description="(11.2) Creates a portal with the image portlet, defining multiple instances and windows."
+          name="05"
+          depends="init-05, g-init, g-reset, 05-package"
+  />
+  <target description="(11.3) Creates the zip file containing CMS content."
+          name="06"
+          depends="init-06, 06-package"
+  />
+  <target description="(11.4.3) Creates a portal that illustrates access control."
+          name="07"
+          depends="init-07, g-init, g-reset, 07-package"
+  />
+  <target description="(11.4.3) Creates a portal with subpages that illustrates access control."
+          name="08"
+          depends="init-08, g-init, g-reset, 08-package"
+  />
+  <target description="(11.5) Creates and deploys a custom portal."
+          name="09"
+          depends="init-09, g-init, g-reset, 09-package, theme, custom"
+  />
+
+
+  <!--
+    ============================================================================
+      This set of variations of the major targets compile, package and deploy
+      the application. Initialization of the application server and database, if
+      needed, is left up to you. You can avoid application deployment by
+      setting "-Dno.deploy" on the ant command line.
+    ============================================================================
+  -->
+  <target name="01-package"
+          depends="init-01, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="02-package"
+          depends="init-02, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="03-package"
+          depends="init-03, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="04-package"
+          depends="init-04, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="05-package"
+          depends="init-05, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="06-package" depends="init-06, g-init, g-clean, cms" />
+  <target name="07-package"
+          depends="init-07, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="08-package"
+          depends="init-08, g-init, g-clean, alt-NN, g-war, g-deploy-war-exploded"
+  />
+  <target name="09-package" depends="init-09, g-init, g-clean, alt-NN, g-war" />
+
+
+  <!--
+    ============================================================================
+      The following targets set properties that are specific to each example.
+      This must be done before the global initialization.
+    ============================================================================
+  -->
+  <target name="init-01">
+    <property name="alt.target" value="01" />
+  </target>
+  <target name="init-02">
+    <property name="alt.target" value="02" />
+  </target>
+  <target name="init-03">
+    <property name="alt.target" value="03" />
+  </target>
+  <target name="init-04">
+    <property name="alt.target" value="04" />
+  </target>
+  <target name="init-05">
+    <property name="alt.target" value="05" />
+  </target>
+  <target name="init-06">
+    <property name="alt.target" value="06" />
+  </target>
+  <target name="init-07">
+    <property name="alt.target" value="07" />
+    <property name="alt.07.08" value="true" />
+  </target>
+  <target name="init-08">
+    <property name="alt.target" value="08" />
+    <property name="alt.07.08" value="true" />
+  </target>
+  <target name="init-09">
+    <property name="alt.target" value="09" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets apply the configurations and variations, as defined
+      by each example. This must be done before the code is compiled.
+    ============================================================================
+  -->
+  <!-- Every alternative does the same thing - copies the config files. -->
+  <target name="alt-NN" depends="alt-07-08">
+    <copy todir="${dir.output}/${war.name}/WEB-INF"
+          overwrite="true"
+          verbose="true"
+    >
+      <fileset dir="${dir.alt}/${alt.target}" excludes="**/*.txt" />
+    </copy>
+  </target>
+
+  <!--
+    For alternative 07 and 08, we also modify the file that loads the initial
+    set of roles and users into the portal, adding our own roles and users.
+    Note that we always grab them from 07.
+  -->
+  <target name="alt-07-08" if="alt.07.08">
+    <loadfile property="setup.addendum1"
+              srcfile="${dir.alt}/07/setup_addendum1.txt"
+    >
+      <filterchain>
+        <headfilter lines="-1" skip="20" />
+      </filterchain>
+    </loadfile>
+    <loadfile property="setup.addendum2"
+              srcfile="${dir.alt}/07/setup_addendum2.txt"
+    >
+      <filterchain>
+        <headfilter lines="-1" skip="20" />
+      </filterchain>
+    </loadfile>
+    <copy todir="${dir.output}/portal" verbose="true">
+      <fileset dir="${dir.deploy}/jboss-portal.sar/conf/hibernate/user"
+               includes="**/*.txt"
+      />
+      <filterchain>
+        <replacestring from="   HibernateRoleImpl userRole = new HibernateRoleImpl(&quot;User&quot;, &quot;Users&quot;);"
+                       to="${setup.addendum1}"
+        />
+        <replacestring from="   tx.commit();" to="${setup.addendum2}" />
+      </filterchain>
+    </copy>
+    <copy todir="${dir.deploy}/jboss-portal.sar/conf/hibernate/user"
+          verbose="true"
+          overwrite="true"
+    >
+      <fileset dir="${dir.output}/portal" includes="**/*.txt" />
+    </copy>
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      The following targets do the extra work necessary to initialize the 
+      properties used during the build.
+    ============================================================================
+  -->
+
+  <!-- Set these before the global properties are set. -->
+  <target name="init-pre">
+    <property name="app.name" value="image" />
+    <property name="db.datasource" value="PortalDS" />
+    <property name="book.chapter" value="Ch 12,13 - JBoss Portal" />
+  </target>
+
+  <!-- Set these after the global properties are set. -->
+  <target name="init-post">
+    <!-- Set properties related to the source files. -->
+    <property name="dir.cms" location="${dir.src}/main/cms" />
+    <property name="dir.theme" location="${dir.src}/main/theme" />
+    <property name="dir.custom.src" location="${dir.src}/main/custom" />
+
+    <!-- Set properties related to the generated files. -->
+    <property name="war.theme" value="jbia-theme.war" />
+    <property name="dir.custom" location="${dir.output}/custom" />
+    <property name="dir.custom.portal"
+              location="${dir.custom}/jbia-portal.sar"
+    />
+
+    <!-- Specify optional processing required -->
+    <property name="need.portal" value="true" />
+
+    <!-- Set the classpath to the portal JARs -->
+    <path id="classpath">
+      <fileset dir="${home.portal}/jboss-portal.sar/lib" includes="**/*.jar" />
+    </path>
+
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to compile, package and
+      deploy the examples.
+    ============================================================================
+  -->
+
+  <!-- Gathers extra files in preparation to create WAR file. -->
+  <target name="pre-war">
+    <mkdir dir="${dir.output}/${war.name}/WEB-INF/lib" />
+    <copy todir="${dir.output}/${war.name}/WEB-INF/lib">
+      <fileset file="lib/standard-1.1.2.jar" />
+    </copy>
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets do the extra work necessary to initialize the
+      application server for use with the examples.
+    ============================================================================
+  -->
+
+  <!-- Do this after the application server has been initalized. -->
+  <target name="jboss-post" depends="as423-check, as423-cache, permgen">
+    <!-- Deploy the portal -->
+    <copy todir="${dir.deploy}/jboss-portal.sar">
+      <fileset dir="${home.portal}/jboss-portal.sar" />
+    </copy>
+  </target>
+
+  <!--
+    Set max permgen to 128MB. It gets added in the middle of the options,
+    thus if it has already been added the token will not match and therefore
+    it will not get added twice.
+  -->
+  <target name="permgen" depends="permgen.windows, permgen.linux" />
+  <target name="permgen.windows" if="os.windows">
+    <replace file="${home.jboss}/bin/run.bat"
+             token="%JAVA_OPTS% -Xms128m"
+             value="%JAVA_OPTS% -XX:MaxPermSize=128m -Xms128m"
+    />
+  </target>
+  <target name="permgen.linux" if="os.linux">
+    <replace file="${home.jboss}/bin/run.conf"
+             token="-Xmx512m -Dsun.rmi"
+             value="-Xmx512m -XX:MaxPermSize=128m -Dsun.rmi"
+    />
+  </target>
+
+  <!--
+    Determine if JBoss Cache is available (it is not present in AS 4.2.3). If
+    not, copy it from the 'all' configuration.
+  -->
+  <target name="as423-check">
+    <available classname="org.jboss.cache.TreeCache" property="using.jbossas422" />
+  </target>
+  <target name="as423-cache" unless="using.jbossas422">
+    <copy todir="${jboss.base}" preservelastmodified="true">
+      <zipfileset src="${jboss.zip}">
+        <patternset>
+          <include name="jboss-*/server/all/lib/jboss-cache-jdk50.jar" />
+        </patternset>
+      </zipfileset>
+    </copy>
+    <move file="${jboss.base}/${jboss.version}/server/all/lib/jboss-cache-jdk50.jar"
+          todir="${dir.lib}"
+    />
+    <delete dir="${jboss.base}/${jboss.version}/server/all" failonerror="false" />
+  </target>
+
+
+  <!--
+    ============================================================================
+      The following targets perform various tasks specific to the examples.
+    ============================================================================
+  -->
+
+  <!-- Package the example CMS content into a ZIP file. -->
+  <target name="cms">
+    <mkdir dir="${dir.dist}" />
+    <zip destfile="${dir.dist}/cms.zip">
+      <fileset dir="${dir.cms}" />
+    </zip>
+  </target>
+
+  <!-- Package the example theme into a WAR file. -->
+  <target name="theme">
+    <jar destfile="${dir.dist}/${war.theme}" basedir="${dir.theme}" />
+  </target>
+
+
+  <!-- ===================================================================== -->
+  <!--
+    Gathers the files necessary to customize the portal, and then applies those
+    files to the deployed portal. Assumes that 'reset' was called and the portal
+    has not been run.
+   -->
+  <target name="custom" depends="custom-gather">
+    <property name="portal.custom" value="${dir.deploy}/jbia-portal.sar" />
+    <!-- Rename the portal sar directory. -->
+    <move file="${dir.deploy}/jboss-portal.sar" tofile="${portal.custom}" />
+    <!-- Copy custom content to deployed portal. -->
+    <copy todir="${dir.deploy}" overwrite="true">
+      <fileset dir="${dir.custom}" />
+    </copy>
+    <!-- Remove files and directories not used by the custom portal. -->
+    <delete includeemptydirs="true">
+      <fileset dir="${portal.custom}/portal-widget.war" />
+      <fileset dir="${portal.custom}/portal-widget-netvibes.war" />
+      <fileset dir="${portal.custom}/portal-wsrp.sar" />
+      <fileset dir="${portal.custom}/portal-cms.sar/portal/cms/conf/default-content/default"
+      />
+      <fileset file="${portal.custom}/samples/portal-news-samples.war/WEB-INF/default-object.xml"
+      />
+      <fileset file="${portal.custom}/samples/portal-weather-samples.war/WEB-INF/default-object.xml"
+      />
+      <!-- This directory is new in 2.7 -->
+      <fileset file="${portal.custom}/samples/portal-portlet-samples.war/WEB-INF/default-object.xml"
+      />
+    </delete>
+  </target>
+
+  <!--
+    Much of the gathering is done by filtering existing files from the Portal
+    binary, replacing various strings.
+  -->
+  <target name="custom-gather" depends="custom-gather-object-xml">
+
+    <!--
+      Change the color scheme in various style sheets to match the custom style.
+    -->
+    <copy todir="${dir.custom.portal}">
+      <fileset dir="${home.portal}/jboss-portal.sar">
+        <include name="portal-admin.sar/portal-admin.war/style.css" />
+        <include name="portal-cms.sar/portal-cms.war/images/cms/admin/style.css"
+        />
+        <include name="portal-core.war/css/login.css" />
+        <include name="portal-identity.sar/portal-identity.war/style.css" />
+      </fileset>
+      <filterchain>
+        <replacestring from="54708c" to="a57a50" />
+        <replacestring from="5986b3" to="a57a50" />
+        <replacestring from="98b7c6" to="d7a792" />
+        <replacestring from="98B7C6" to="d7a792" />
+        <replacestring from="C0D3DC" to="e7cbbd" />
+        <replacestring from="C8DCC4" to="e1c2e6" />
+        <replacestring from="dfe8ed" to="f2e4de" />
+        <replacestring from="DFE8ED" to="f2e4de" />
+        <replacestring from="ebf2f5" to="f9efea" />
+      </filterchain>
+    </copy>
+
+    <!-- Identify new location of default CMS contents -->
+    <copy todir="${dir.custom.portal}">
+      <fileset dir="${home.portal}/jboss-portal.sar">
+        <include name="portal-cms.sar/META-INF/jboss-service.xml" />
+        <include name="portal-cms.sar/portal-cms.war/WEB-INF/portlet.xml" />
+      </fileset>
+      <filterchain>
+        <replacestring from="/default" to="/book" />
+        <!-- Undo one of the changes -->
+        <replacestring from="/book-content" to="/default-content" />
+      </filterchain>
+    </copy>
+
+    <!-- Change portal title and footer -->
+    <copy todir="${dir.custom.portal}">
+      <fileset dir="${home.portal}/jboss-portal.sar">
+        <include name="portal-core.war/layouts/generic/index.jsp" />
+        <include name="portal-core.war/layouts/generic/maximized.jsp" />
+      </fileset>
+      <filterchain>
+        <replacestring from="&lt;%= PortalConstants.VERSION.toString() %&gt;"
+                       to="JBIA Portal"
+        />
+        <replacestring from="Powered by" to="Custom portal for" />
+        <replacestring from="jboss.com/products/jbossportal"
+                       to="manning.com/jamae"
+        />
+        <replacestring from="JBoss Portal" to="JBoss in Action" />
+      </filterchain>
+    </copy>
+
+    <!-- Copy the binary files. -->
+    <copy todir="${dir.custom.portal}" includeemptydirs="false">
+      <fileset dir="${dir.custom.src}" excludes="**/*-object.xml" />
+    </copy>
+
+    <!-- Copy the image portlet files. -->
+    <mkdir dir="${dir.custom.portal}/${war.name}" />
+    <copy todir="${dir.custom.portal}/${war.name}">
+      <fileset dir="${dir.output}/${war.name}" />
+    </copy>
+
+    <!-- Copy the CMS content. -->
+    <mkdir dir="${dir.custom.portal}/portal-cms.sar/portal/cms/conf/default-content/book"
+    />
+    <copy todir="${dir.custom.portal}/portal-cms.sar/portal/cms/conf/default-content/book"
+    >
+      <fileset dir="${dir.cms}" />
+    </copy>
+
+    <!-- Copy the theme files. -->
+    <mkdir dir="${dir.custom.portal}/${war.theme}" />
+    <copy todir="${dir.custom.portal}/${war.theme}">
+      <fileset dir="${dir.theme}" />
+    </copy>
+  </target>
+
+  <!--
+    The default-object.xml file is different for each release of the portal.
+    The biggest difference was from 2.6.1 to 2.6.2, when the user management was
+    transformed into a full-blown identify service. This target determines which
+    version of the portal is being used and copies the appropriate
+    default-object.xml file.
+  -->
+  <target name="custom-gather-object-xml">
+    <!-- Look for one of the new files in 2.6.2 (or later) -->
+    <condition property="dir.object.xml" value="262">
+      <available file="${home.portal}/jboss-portal.sar/portal-identity.sar/META-INF/jboss-service.xml"
+      />
+    </condition>
+    <!-- The default is 2.6.1 -->
+    <property name="dir.object.xml" value="261" />
+    <!-- Now copy the file default-object.xml file.-->
+    <copy todir="${dir.custom.portal}/conf/data">
+      <fileset dir="${dir.custom.src}/conf/data/${dir.object.xml}" />
+    </copy>
+  </target>
+
+
+  <!-- 
+    ============================================================================
+      These targets clean up the mess we made.
+    ============================================================================
+  -->
+
+  <target description="Removes all generated files."
+          name="clean"
+          depends="g-clean"
+  />
+  <target description="Removes all generated files, the JBoss AS configuration, and the database."
+          name="clean-all"
+          depends="g-clean-all"
+  />
+
+</project>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<server>
+
+	<mbean code="org.jboss.remoting.transport.Connector"
+		name="jboss.remoting:type=Connector,transport=sslsocket3843,handler=ejb3">
+		<attribute name="InvokerLocator">sslsocket://${jboss.bind.address}:3843</attribute>
+		<attribute name="Configuration">
+			<config>
+				<handlers>
+					<handler subsystem="AOP">org.jboss.aspects.remoting.AOPRemotingInvocationHandler</handler>
+				</handlers>
+			</config>
+		</attribute>
+	</mbean>
+
+</server>

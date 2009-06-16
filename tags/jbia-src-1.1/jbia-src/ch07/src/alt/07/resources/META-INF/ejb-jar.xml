@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd"
+	version="3.0">
+
+	<assembly-descriptor>
+		<!-- <method-permission>
+			<role-name>bank-manager</role-name>
+			<role-name>teller</role-name>
+			<method>
+				<ejb-name>StatelessCalculatorBean</ejb-name>
+				<method-name>*</method-name>
+			</method>
+		</method-permission>
+		 -->
+		<method-permission>
+			<role-name>teller</role-name>
+			<method>
+				<ejb-name>StatelessCalculatorBean</ejb-name>
+				<method-name>calculateFutureValue</method-name>
+			</method>
+		</method-permission>
+		<method-permission>
+			<role-name>bank-manager</role-name>
+			<method>
+				<ejb-name>StatelessCalculatorBean</ejb-name>
+				<method-name>getInterestRate</method-name>
+			</method>
+		</method-permission>
+		<method-permission>
+			<unchecked />
+			<method>
+				<ejb-name>StatelessCalculatorBean</ejb-name>
+				<method-name>freeForAll</method-name>
+			</method>
+		</method-permission>
+		<exclude-list>
+			<method>
+				<ejb-name>StatelessCalculatorBean</ejb-name>
+				<method-name>getTheAnswerToLifeTheUniverseAndEverything</method-name>
+			</method>
+		</exclude-list>
+	</assembly-descriptor>
+</ejb-jar>

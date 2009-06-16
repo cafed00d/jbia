@@ -1,0 +1,33 @@
+//==============================================================================
+//  Copyright 2008, Javid Jamae and Peter Johnson
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+//  use this file except in compliance with the License. You may obtain a copy
+//  of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+//  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+//  License for the specific language governing permissions and limitations
+//  under the License.
+//==============================================================================
+//
+// These statements save the roles and users used by the access control
+// example.They are inserted into the jboss-portal.sar/conf/hibernate/user/
+// setup.txt file.
+
+   session.save(role1);
+   session.save(user1);
+   session.save(role2);
+   session.save(user2);
+   session.save(role3);
+   session.save(user3);
+   session.save(role4);
+   session.save(user4);
+   session.save(role5);
+   session.save(user5);
+
+   // Line retained from the setup.txt file:
+   tx.commit();
