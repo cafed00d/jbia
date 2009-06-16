@@ -113,13 +113,7 @@
   <target name="init-04">
     <property name="alt.target" value="04" />
     <property name="need.second.server" value="true" />
-    <!--
-      JBoss AS 5.1.0.GA contains the files needed to run as a Windows service
-      so JBoss Native is not required. However, the code to apply Native is 
-      this in this script, so if you would like Native to be installed,
-      uncomment this property.
     <property name="need.native" value="true" />
-    -->
     <property name="app.name" value="service" />
     <property name="dir.main" value="src/${app.name}" />
     <property name="linux.distro" value="redhat" />
@@ -183,11 +177,11 @@
   <!--
     Installs the JBoss Native files. Be aware the 5.0.0.GA ships with the
     service.bat and jbosssvc.exe file necessary to run JBoss AS as a service.
-    Unfortunately, the jbosssvc.exe file is corrupt and does not work. However,
-    by always copying from JBoss Native, you will get the correct version of
-    jbosssvc.exe on Windows provided you set home.native to the proper version
-    of JBoss Native. If you are running Linux, or you have JBoss AS 5.1.0, you
-    can ignore all of that.
+    Unfortunately, the jbosssvc.exe file is 32-bit and does not work on 64-bit
+    Windows systems. However, by always copying from JBoss Native, you will get
+    the correct version of jbosssvc.exe on Windows provided you set home.native
+    to the proper version of JBoss Native. If your are running Linux, you can
+    ignore all of that.
   -->
   <target name="jboss-native" if="need.native">
     <copy todir="${home.jboss}/bin"

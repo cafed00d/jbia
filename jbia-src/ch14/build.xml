@@ -124,17 +124,33 @@
   <target name="jboss-post-windows" if="os.windows">
     <antcall target="copy-run">
       <param name="param.run" value="run.bat" />
-      <param name="param.conf" value="run.conf.bat" />
     </antcall>
+    <copy file="${dir.dist}/run.bat" tofile="${home.jboss}/bin/run-perf.bat" />
   </target>
   <target name="jboss-post-linux" if="os.linux">
     <antcall target="copy-run">
-      <param name="param.run" value="run.sh" />
-      <param name="param.conf" value="run.conf" />
+      <param name="param.run" value="run.conf" />
     </antcall>
+    <!-- Create a second run script, rather than replacing the existing one -->
+    <copy todir="${dir.dist}">
+      <fileset dir="${home.jboss}/bin" includes="run.sh" />
+      <filterchain>
+        <replacestring from="run.conf" to="run-perf.conf" />
+        <replacestring from="org.jboss.Main" to="org.jboss.Main -c perf" />
+        <deletecharacters chars="\r" />
+      </filterchain>
+    </copy>
+    <copy file="${dir.dist}/run.conf"
+          tofile="${home.jboss}/bin/run-perf.conf"
+          overwrite="true"
+    />
+    <copy file="${dir.dist}/run.sh"
+          tofile="${home.jboss}/bin/run-perf.sh"
+          overwrite="true"
+    />
     <chmod perm="a+x">
       <fileset dir="${home.jboss}/bin">
-        <include name="perf-*" />
+        <include name="run-perf.*" />
       </fileset>
     </chmod>
   </target>
@@ -144,41 +160,19 @@
     then invokes the run script, but the run script also sets heap sizes and
     the last heap size set wins. Therefore, it is necessary to modify the
     existing run script. Note that this copy task depends on a very specific
-    heap setting layout in the run scripts; if that layout changes this
-    task might not work as intended.
+    heap setting currently in the run scripts; if those settings change this
+    task will not do what is intended.
   -->
   <target name="copy-run">
-    <!-- Modify the run conf file to contain the new settings -->
-    <copy todir="${dir.dist}">
-      <fileset dir="${home.jboss}/bin" includes="${param.conf}" />
-      <filterchain>
-        <!-- Wonderful, on Linux it is 128m, on Windows 128M... -->
-        <replaceregex pattern="-Xms\d*[mM] -Xmx\d*[mM]"
-                      replace="-Xms1200m -Xmx1200m -XX:NewSize=400M -XX:MaxNewSize=400M -XX:SurvivorRatio=32 -XX:+UseTLAB -XX:TLABSize=64K -verbose:gc"
-        />
-      </filterchain>
-    </copy>
-    <!--
-      Modify the run script to reference the new conf file, and to run the
-      perf server configuration.
-    -->
     <copy todir="${dir.dist}">
       <fileset dir="${home.jboss}/bin" includes="${param.run}" />
       <filterchain>
-        <replacestring from="${param.conf}" to="perf-${param.conf}" />
+        <replacestring from="-Xms128m -Xmx512m"
+                       to="-Xms1200m -Xmx1200m -XX:NewSize=400M -XX:MaxNewSize=400M -XX:SurvivorRatio=32 -XX:+UseTLAB -XX:TLABSize=64K -verbose:gc"
+        />
         <replacestring from="org.jboss.Main" to="org.jboss.Main -c perf" />
-        <deletecharacters chars="\r" />
       </filterchain>
     </copy>
-    <!--
-      Copy both the run script and conf files as files with the perf- prefix.
-    -->
-    <copy file="${dir.dist}/${param.run}"
-          tofile="${home.jboss}/bin/perf-${param.run}"
-    />
-    <copy file="${dir.dist}/${param.conf}"
-          tofile="${home.jboss}/bin/perf-${param.conf}"
-    />
   </target>
 
 
@@ -200,7 +194,7 @@
   <!-- Removes the run scripts we created. -->
   <target name="clean-run">
     <delete failonerror="false">
-      <fileset dir="${home.jboss}/bin" includes="perf*" />
+      <fileset dir="${home.jboss}/bin" includes="run-perf.*" />
     </delete>
   </target>
 
