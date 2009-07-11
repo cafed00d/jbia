@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/client/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JBOSS_HOME/client/jbossall-client.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/client/jboss-jaxws.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/client/jbossws-native-jaxws.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
