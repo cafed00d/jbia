@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JBOSS_PORTAL/jboss-portal.sar/lib/portal-portlet-jsr168api-lib.jar"/>
-	<classpathentry kind="var" path="JBOSS_PORTAL/jboss-portal.sar/lib/portal-portlet-lib.jar"/>
+	<classpathentry kind="var" path="PORTAL_HOME/jboss-portal.sar/lib/portlet-api.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
