@@ -6,5 +6,8 @@
 	<classpathentry kind="src" path="src/valves/java"/>
 	<classpathentry kind="src" path="src/virtualhost/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/jboss-javaee.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jbossweb.sar/jsf-libs/jsf-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

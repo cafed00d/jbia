@@ -5,9 +5,9 @@
 	<classpathentry kind="src" path="src/route/java"/>
 	<classpathentry kind="src" path="src/scoped/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JBOSS_HOME/client/jbossall-client.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/servlet-api.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/hibernate3.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/client/jboss-javaee.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/hibernate-core.jar"/>
 	<classpathentry kind="lib" path="lib/standard-1.1.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
