@@ -41,6 +41,6 @@ Most of the red Xs should now be gone. There will still be a red X on the follow
   * ch03, ch05 – there are duplicate class files in different source directories.
   * ch07, ch08, ch09 – the source files use a conditional compilation mechanism and thus are not valid Java source files
 
-You can edit the source files within Eclipse but you must run the builds from the command line – the projects are not set up to use the Ant scripts for builds.
+You can edit the source files within Eclipse but you must run the builds from the command line – the projects are not set up to use the Eclipse capability to build using an Ant script.
 
 *NOTE:* the jbia-src-1.0.zip download contains obsolete library locations; if you use it you will have to also correct the library locations. The jbia-src-1.1.zip download and Subversion trunk and branches/jbia-src-1.x have the correct locations.
